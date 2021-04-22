@@ -3,7 +3,10 @@
 # ~~~~
 
 # Home page
-GET        /                             controllers.Application.index
+GET        /                             controllers.Application.login
+POST       /validateUser                 controllers.Application.validateUser
+#GET        /getGameCode                  controllers.Application.generateCode
+
 
 # Prefix must match `play.assets.urlPrefix`
 GET        /assets/*file                 controllers.Assets.at(file)
