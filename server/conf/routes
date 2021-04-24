@@ -4,9 +4,14 @@
 
 # Home page
 GET        /                             controllers.Application.login
-POST       /validateUser                 controllers.Application.validateUser
-#GET        /getGameCode                  controllers.Application.generateCode
+POST       /JoinGame                     controllers.Application.validateUserJoin
+POST       /HostGame                     controllers.Application.validateUserHost
+#GET        /getGameCode                 controllers.Application.generateCode
+GET        /getUser                      controllers.Application.getUsername
+GET        /startGame                    controllers.Application.startGame
 
+# Websocket Routes
+GET        /socket                       controllers.WebSocketApp.socket
 
 # Prefix must match `play.assets.urlPrefix`
 GET        /assets/*file                 controllers.Assets.at(file)

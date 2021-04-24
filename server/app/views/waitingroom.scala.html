@@ -2,5 +2,9 @@
 
 @main("Waiting Room"){
     <body style="background-color:rgba(161, 110, 209, .7)">
-    
+        <input type="hidden" id="csrfToken" value="@helper.CSRF.getToken.value">
+        <input type="hidden" id="ws-route" value="@routes.WebSocketApp.socket().absoluteURL()">
+
+
+    <script src="@routes.Assets.versioned("javascript/waitingroom.js")"></script>
 }

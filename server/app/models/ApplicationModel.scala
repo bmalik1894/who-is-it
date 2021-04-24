@@ -1,0 +1,25 @@
+package models
+
+import collection.mutable.Map
+import java.time.format.DateTimeFormatter
+
+object ApplicationModel {
+    private var games = Map[String, Seq[String]]()
+    
+    def verifyUser(code:String, username:String): Boolean = {
+        if (!games.contains(code)) {
+            true
+        } else {
+        val currentGame = games(code)
+        for (name <- currentGame) {
+            if (username == name) {
+                false
+            }
+        }
+        games(code).:+(username)
+        true
+        }
+        true
+    }
+
+}

@@ -11,18 +11,19 @@ import play.api.libs.streams.ActorFlow
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.actor.Props
+import actors._
 
 @Singleton
-class WebSocketApp @Inject()(cc: MessagesControllerComponents)(implicit system: ActorSystem, mat:Materializer) extends MessagesAbstractController(cc) { 
-    //val manager = system.actorOf(Props[CanvasManager], "Manager")
+class WebSocketApp @Inject()(cc: ControllerComponents)(implicit system: ActorSystem, mat:Materializer) extends AbstractController(cc) { 
+    val manager = system.actorOf(Props[GamesManager], "Manager")
     
     //def index = Action { implicit request =>
     //    Ok(views.html.canvaspage())
     //}
     
-    //def socket = WebSocket.accept[String,String] { request =>
-    //    ActorFlow.actorRef { out =>
-    //        CanvasActor.props(out, manager)
-    //    }
-    //}
+    def socket = WebSocket.accept[String,String] { request =>
+        ActorFlow.actorRef { out =>
+            PlayerActor.props(out, manager)
+        }
+    }
 }

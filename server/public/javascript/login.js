@@ -1,12 +1,12 @@
 "use strict"
 
-let messages = [];
-
 const ce = React.createElement
 const csrfToken = document.getElementById("csrfToken").value;
 
-//const validateRoute = document.getElementById("validateUserRoute").value;
-//const createRoute = document.getElementById("createUserRoute").value;
+//const validateJoinRoute = document.getElementById("validateUserJoin").value;
+//const validateHostRoute = document.getElementById("validateHostJoin").value;
+//const codeRoute = document.getElementById("createUserRoute").value;
+
 
 class MainComponent extends React.Component {
   constructor(props) {
@@ -54,45 +54,23 @@ class CreateComponent extends React.Component {
     };
   }
 
-  componentDidMount() {
-      this.generateGameCode();
-  }
 
   render() {
-    /*return ce('div', null,
-      ce('h2', null, 'Name:'),
-      ce('br'),
-      ce('input', {type: "text", id: "loginName", value: this.state.userName, onChange: e => this.changerHandler(e)}),
-      ce('br'),
-      ce('button', {onClick: e => this.createGame(e)}, 'Create'),
-      ce('span', {id: "login-message"}, this.state.loginMessage),
-      ce('h2', null, 'Create User:'),
-      ce('br'),
-      'Username: ',
-      ce('input', {type: "text", id: "createName", value: this.state.createName, onChange: e => this.changerHandler(e)}),
-      ce('br'),
-      'Password: ',
-      ce('input', {type: "password", id: "createPass", value: this.state.createPass, onChange: e => this.changerHandler(e)}),
-      ce('br'),
-      ce('button', {onClick: e => this.createUser(e)}, 'Create User'),
-      ce('span', {id: "create-message"}, this.state.createMessage)
-    );*/
-    return ce(div, null,
-        ce("h2", null, "Name"),
-        ce('br'),
-        ce('input', {type: "text", id: "username-slot", value: this.state.userName, onChange: e => this.changeUsername(e)}),
-        ce('br'),
-        ce('input', {type: "range", id: "numRounds", min: "1", max: "8", value: "4", onChange: e=> this.changeRange(e)})
-        );}
 
-        changeRange(e) {
-            console.log("Changing range to " + e.value);
-            this.setState(e.value);
-        }
+    return ce('div', {id: "ccdiv"},
+        ce("h3", null, "Name: "),
+        ce('br'),
+        ce('form', {id:"submitFormHost", method:"POST", action:"/HostGame"}, 
+        ce('input', {type: "text", id: "txtUsernameHost", value: this.state.userName, onChange: e => this.changeUsername(e)}),
+        ce('input', {type: 'submit', id: "submitButtonHost", value:"Submit"})
+        )
+        );}
 
         changeUsername(e) {
             this.setState({userName: e.target.value});
+            console.log(this.state.userName);
         }
+         
 }
 
 class JoinComponent extends React.Component {
@@ -109,12 +87,16 @@ class JoinComponent extends React.Component {
       }
 
     render() {
-        return ce(div, null, 
+        return ce('div', null, 
             ce("h2", null, "Join Game!"),
             ce('br'),
-            ce('input', {type: "text", id: "username-slot", value: this.state.userName, onChange: e => this.changeUsername(e)}),
+            ce('h3', null, "Name: "),
+            ce('input', {type: "text", id: "txtUsernameJoin", value: this.state.userName, onChange: e => this.changeUsername(e)}),
             ce('br'),
-            ce('input', {type: "text", id: "txtGameCode", value: this.state.gameCode, onChange: e => this.changeGameCode(e)}),
+            ce('h3', null, "Game Code: "),
+            ce('input', {type: "text", id: "txtGameCodeJoin", value: this.state.gameCode, onChange: e => this.changeGameCode(e)}),
+            ce('br'),
+            ce('button', {id:"submitButtonJoin", action:'/HostGame'})
             );}
         
             changeGameCode(e) {
