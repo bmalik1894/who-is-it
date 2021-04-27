@@ -3,11 +3,6 @@
 const ce = React.createElement
 const csrfToken = document.getElementById("csrfToken").value;
 
-//const validateJoinRoute = document.getElementById("validateUserJoin").value;
-//const validateHostRoute = document.getElementById("validateHostJoin").value;
-//const codeRoute = document.getElementById("createUserRoute").value;
-
-
 class MainComponent extends React.Component {
   constructor(props) {
     super(props);
@@ -16,10 +11,10 @@ class MainComponent extends React.Component {
 
   render() {
     if (this.state.action == "joining") {
-        return ce(JoinComponent, {});
+        return ce(JoinComponent, { goBackToMain: () => this.setState({action:"main"})});
     }
     else if (this.state.action == "creating") {
-        return ce(CreateComponent, {});
+        return ce(CreateComponent, {goBackToMain: () => this.setState({action:"main"})});
     } else {
         return ce('div', null,
             ce('h2', null, 'Create Game:'),
@@ -47,12 +42,10 @@ class CreateComponent extends React.Component {
     this.state = {
       userName: "", 
       gameCode: "",
-      numRounds: "4", 
-      createPass: "",
-      loginMessage: "",
-      createMessage: ""
+      errorMessage: ""
     };
   }
+
 
 
   render() {
@@ -60,17 +53,39 @@ class CreateComponent extends React.Component {
     return ce('div', {id: "ccdiv"},
         ce("h3", null, "Name: "),
         ce('br'),
-        ce('form', {id:"submitFormHost", method:"POST", action:"/HostGame"}, 
-        ce('input', {type: "text", id: "txtUsernameHost", value: this.state.userName, onChange: e => this.changeUsername(e)}),
-        ce('input', {type: 'submit', id: "submitButtonHost", value:"Submit"})
-        )
+        ce('input', {type: "text", id: "txtUsernameHost", value: this.state.userName, onChange: e => this.changeUsername(e)}), //add csrf token to header
+        ce('button', {type: 'submit', id: "submitButtonHost", onClick: e => this.handleSubmit(e), value:"Submit"}, "Submit"),
+        ce('br'),
+        ce('button', {id: "goBackButtonJoin", onClick: e => this.goBack(e), value:"Go Back"}, "Go Back")
         );}
 
         changeUsername(e) {
             this.setState({userName: e.target.value});
-            console.log(this.state.userName);
         }
-         
+
+        handleSubmit(event) {
+          const username = this.state.userName;
+          console.log(username)
+          if (this.state.userName.length != 0) {
+            fetch(validateHostRoute.value, { 
+              method: 'POST', 
+              headers: {'Content-Type': 'application/json', 'Csrf-Token': csrfToken }, 
+              body: JSON.stringify({user:username})
+              }
+            ).then(res => res.text()).then(bool => {
+              if (bool == 'true') {
+                window.location.href = "/startGame"
+              } else {
+                this.state.errorMessage = "Failed check"  
+              }
+            });
+            
+          }
+        }
+
+        goBack(e) {
+          this.props.goBackToMain();
+        }
 }
 
 class JoinComponent extends React.Component {
@@ -79,10 +94,7 @@ class JoinComponent extends React.Component {
         this.state = {
           userName: "", 
           gameCode: "",
-          createName: "", 
-          createPass: "",
-          loginMessage: "",
-          createMessage: ""
+          errorMessage: ""
         };
       }
 
@@ -90,14 +102,17 @@ class JoinComponent extends React.Component {
         return ce('div', null, 
             ce("h2", null, "Join Game!"),
             ce('br'),
+            ce('form', {action:'/JoinGame'}, 
             ce('h3', null, "Name: "),
             ce('input', {type: "text", id: "txtUsernameJoin", value: this.state.userName, onChange: e => this.changeUsername(e)}),
             ce('br'),
             ce('h3', null, "Game Code: "),
             ce('input', {type: "text", id: "txtGameCodeJoin", value: this.state.gameCode, onChange: e => this.changeGameCode(e)}),
             ce('br'),
-            ce('button', {id:"submitButtonJoin", action:'/HostGame'})
-            );}
+            ce('button', {id: "submitButtonJoin", onClick: e => this.handleSubmit(e), value:"Submit"}, "Submit"),
+            ce('br'),
+            ce('button', {id: "goBackButtonJoin", onClick: e => this.goBack(e), value:"Go Back"}, "Go Back")
+        ));}
         
             changeGameCode(e) {
                 this.setState({gameCode: e.target.value});
@@ -105,6 +120,29 @@ class JoinComponent extends React.Component {
 
             changeUsername(e) {
                 this.setState({userName: e.target.value});
+            }
+
+            handleSubmit(event) {
+              const username = this.state.userName;
+              const gameCode = this.state.gameCode;
+              if (this.state.userName.length != 0 && this.state.gameCode != 0) {
+                fetch(validateHostRoute.value, { 
+                  method: 'POST', 
+                  headers: {'Content-Type': 'application/json', 'Csrf-Token': csrfToken }, 
+                  body: JSON.stringify({user:username, code:gameCode})
+                  }
+                ).then(res => res.text()).then(bool => {
+                  if (bool == 'true') {
+                    window.location.href = "/startGame"
+                  } else {
+                    this.state.errorMessage = "Failed check"  
+                  }
+                });
+              }
+            }
+
+            goBack(e) {
+              this.props.goBackToMain();
             }
 }
 

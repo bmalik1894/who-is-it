@@ -3,14 +3,20 @@
 const socketRoute = document.getElementById("ws-route").value;
 let websock = (location.protocol == "https:") ? socketRoute.replace("http","wss") : socketRoute.replace("http", "ws");
 const socket = new WebSocket(websock);
-let currUser = fetch(getUserRoute);
-//let isHost = fetch(amIHost);
-console.log("made it!")
-//if (session == 'host')
-    socket.onopen = socket.send("NEWGAME,USERNAME");
-//    else {
-    socket.onopen = socket.send("JOIN,USERNAME");
-//    }
+let currUser = document.getElementById("usernameInput").value;
+currUser = currUser.substring(1, currUser.length - 1)
+let isHost = false
+if (document.getElementById("stateInput").value == 'host') {
+    isHost = true 
+}
+
+if (isHost) {
+    socket.onopen = (event) => socket.send("NEWGAME," + currUser);
+} else {
+    socket.onopen = (event) => socket.send("JOIN," + currUser);
+}
+
+console.log(isHost + " " + currUser);
 
 //React:
 //Enter Username
@@ -36,5 +42,3 @@ console.log("made it!")
     // changerHandler(e) {
     //     this.setState({ [e.target['id']]: e.target.value });
     //   }
-    
-    

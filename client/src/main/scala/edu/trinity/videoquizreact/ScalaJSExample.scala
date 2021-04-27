@@ -11,11 +11,12 @@ object ScalaJSExample {
 
   def main(args: Array[String]): Unit = {
     // dom.document.getElementById("scalajsShoutOut").textContent = SharedMessages.itWorks
+    if (dom.document.getElementById("root") != null) {
     println("Call the react stuff.")
     ReactDOM.render(
       h1("Hello, world!"),
       dom.document.getElementById("root")
-    )
-
+      )
+    }
   }
 }

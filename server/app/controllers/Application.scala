@@ -18,41 +18,58 @@ class Application @Inject()(cc: ControllerComponents) extends AbstractController
     Ok(views.html.login())
   }
 
-  def validateUserJoin = Action { implicit request =>
+  /*def validateUserJoin = Action { implicit request =>
     val postvals = request.body.asFormUrlEncoded
     postvals.map { args =>
-      val username = args("txtUsernameJoin").head
+      val username = "test"
       val gameCode = args("txtGameCodeJoin").head
       if (ApplicationModel.verifyUser(gameCode, username)) {
-        Ok(views.html.waitingroom())
+        Ok(views.html.gameroom(username, "player"))
         .withSession("username" -> username, "code" -> gameCode, "state" -> "player", "csrfToken" -> play.filters.csrf.CSRF.getToken.get.value)
       } else {
         Redirect(routes.Application.login()).flashing("error" -> "Could not verify username or Game Code.")
       }
     }.getOrElse(Redirect(routes.Application.login())) 
+  }*/
+
+  def validateUserJoin = Action { implicit request =>
+    request.body.asJson.map { data => 
+      val username = data("user").toString()
+      val gameCode = data("code").toString()  
+        if (ApplicationModel.verifyUser(gameCode, username)) {
+        println("succeeded check")
+        Ok("true")
+          .withSession("username" -> username, "code" -> gameCode, "state" -> "player", "csrfToken" -> play.filters.csrf.CSRF.getToken.get.value)
+        } else {
+          println("Failed check")
+        Ok("false")
+        }
+      }.getOrElse(Redirect(routes.Application.login()).flashing("error" -> "Could not verify username."))
   }
 
+
   def validateUserHost = Action { implicit request =>
-    val postvals = request.body.asFormUrlEncoded
-    postvals.map { args =>
-      val username = args("txtUsernameHost").head
-      if (ApplicationModel.verifyUser("", username)) {
-        Ok(views.html.waitingroom())
-        .withSession("username" -> username, "code" -> "", "state" -> "host", "csrfToken" -> play.filters.csrf.CSRF.getToken.get.value)
-      } else {
-        Redirect(routes.Application.login()).flashing("error" -> "Could not verify username.")
-      }
-    }.getOrElse(Redirect(routes.Application.login())) 
+      request.body.asJson.map { data => 
+        val username = data("user").toString()
+          if (ApplicationModel.verifyUser("", username)) {
+          println("succeeded check")
+          Ok("true")
+            .withSession("username" -> username, "code" -> "", "state" -> "host", "csrfToken" -> play.filters.csrf.CSRF.getToken.get.value)
+          } else {
+            println("Failed check")
+          Ok("false")
+          }
+        }.getOrElse(Redirect(routes.Application.login()).flashing("error" -> "Could not verify username."))
   }
 
   def startGame = Action { implicit request =>
-    Ok(views.html.waitingroom())
+    val username = request.session.get("username").getOrElse("")
+    val state = request.session.get("state").getOrElse("player")
+    Ok(views.html.gameroom(username, state))
   }
 
-  def getUsername = Action { implicit request =>
-    val usernameOption = request.session.get("username")
-    val username = usernameOption.getOrElse("")
-    Ok(username)
+  def validatecsrf = Action { implicit request =>
+    Ok(views.html.login()).withSession("csrfToken" -> play.filters.csrf.CSRF.getToken.get.value)
   }
 
 }

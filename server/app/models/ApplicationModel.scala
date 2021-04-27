@@ -8,6 +8,7 @@ object ApplicationModel {
     
     def verifyUser(code:String, username:String): Boolean = {
         if (!games.contains(code)) {
+            if (code.length != 0) { games += (code-> Seq(username)) }
             true
         } else {
         val currentGame = games(code)
