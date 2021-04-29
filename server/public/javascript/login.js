@@ -102,7 +102,7 @@ class JoinComponent extends React.Component {
         return ce('div', null, 
             ce("h2", null, "Join Game!"),
             ce('br'),
-            ce('form', {action:'/JoinGame'}, 
+
             ce('h3', null, "Name: "),
             ce('input', {type: "text", id: "txtUsernameJoin", value: this.state.userName, onChange: e => this.changeUsername(e)}),
             ce('br'),
@@ -112,7 +112,7 @@ class JoinComponent extends React.Component {
             ce('button', {id: "submitButtonJoin", onClick: e => this.handleSubmit(e), value:"Submit"}, "Submit"),
             ce('br'),
             ce('button', {id: "goBackButtonJoin", onClick: e => this.goBack(e), value:"Go Back"}, "Go Back")
-        ));}
+        );}
         
             changeGameCode(e) {
                 this.setState({gameCode: e.target.value});
@@ -126,7 +126,7 @@ class JoinComponent extends React.Component {
               const username = this.state.userName;
               const gameCode = this.state.gameCode;
               if (this.state.userName.length != 0 && this.state.gameCode != 0) {
-                fetch(validateHostRoute.value, { 
+                fetch(validateJoinRoute.value, { 
                   method: 'POST', 
                   headers: {'Content-Type': 'application/json', 'Csrf-Token': csrfToken }, 
                   body: JSON.stringify({user:username, code:gameCode})

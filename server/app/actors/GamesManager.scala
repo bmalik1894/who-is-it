@@ -3,9 +3,12 @@ package actors
 import akka.actor.Actor
 import akka.actor.Props
 import akka.actor.ActorRef
+import akka.actor.ActorSystem
 import collection.mutable
 import scala.util.Random
+
 import GameActor._
+
 
 class GamesManager extends Actor {
     import GamesManager._
@@ -16,12 +19,18 @@ class GamesManager extends Actor {
 
     def receive = {
         case NewPal(p) => pals ::= p
-        case NewGame(host,name) =>val s = generateCode()
-                             val newGame = new GameActor(s,self,host,name)
+        case NewGame(host,name) => {val s = generateCode()
+                                   val newGame = context.actorOf(Props(new GameActor(s, self, host, name))) 
+                                    }
         case GameMade(nGame,nCode) => games(nCode) = nGame
         case JoinGame(pal,name,code) => if(games.contains(code)){
                                             games(code) ! GameActor.AddPal(pal,name)
-                                        }else{ pal ! PlayerActor.JoinFailed()}
+                                        }else{
+                                            games.foreach(x => println("good code:"+x))
+                                            println("failed code:"+code)
+                                            println("name:"+name)
+                                             pal ! PlayerActor.JoinFailed()
+                                             }
         case m => println("Unhandled message in GamesManager: "+m)
     }
     def generateCode(): String = {
@@ -35,4 +44,5 @@ object GamesManager{
     case class NewGame(host: ActorRef,name: String)
     case class JoinGame(pal: ActorRef,name: String, code: String)
     case class GameMade(game: ActorRef, code:String)
+   
 }

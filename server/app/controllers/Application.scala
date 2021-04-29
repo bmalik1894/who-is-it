@@ -39,7 +39,7 @@ class Application @Inject()(cc: ControllerComponents) extends AbstractController
         if (ApplicationModel.verifyUser(gameCode, username)) {
         println("succeeded check")
         Ok("true")
-          .withSession("username" -> username, "code" -> gameCode, "state" -> "player", "csrfToken" -> play.filters.csrf.CSRF.getToken.get.value)
+          .withSession("username" -> username, "code" -> gameCode, "csrfToken" -> play.filters.csrf.CSRF.getToken.get.value)
         } else {
           println("Failed check")
         Ok("false")
@@ -54,7 +54,7 @@ class Application @Inject()(cc: ControllerComponents) extends AbstractController
           if (ApplicationModel.verifyUser("", username)) {
           println("succeeded check")
           Ok("true")
-            .withSession("username" -> username, "code" -> "", "state" -> "host", "csrfToken" -> play.filters.csrf.CSRF.getToken.get.value)
+            .withSession("username" -> username, "code" -> "host", "csrfToken" -> play.filters.csrf.CSRF.getToken.get.value)
           } else {
             println("Failed check")
           Ok("false")
@@ -64,8 +64,8 @@ class Application @Inject()(cc: ControllerComponents) extends AbstractController
 
   def startGame = Action { implicit request =>
     val username = request.session.get("username").getOrElse("")
-    val state = request.session.get("state").getOrElse("player")
-    Ok(views.html.gameroom(username, state))
+    val code = request.session.get("code").getOrElse("player")
+    Ok(views.html.gameroom(username, code))
   }
 
   def validatecsrf = Action { implicit request =>

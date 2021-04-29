@@ -16,10 +16,7 @@ import actors._
 @Singleton
 class WebSocketApp @Inject()(cc: ControllerComponents)(implicit system: ActorSystem, mat:Materializer) extends AbstractController(cc) { 
     val manager = system.actorOf(Props[GamesManager], "Manager")
-    
-    //def index = Action { implicit request =>
-    //    Ok(views.html.canvaspage())
-    //}
+
     
     def socket = WebSocket.accept[String,String] { request =>
         ActorFlow.actorRef { out =>
