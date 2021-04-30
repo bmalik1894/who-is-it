@@ -32,12 +32,14 @@ class GameActor(code:String,manager: ActorRef, host:ActorRef, hostName: String) 
         case Ready() => ready += 1
                         if(ready == players.length){
                             started = true
+                            players.foreach(x => x ! PlayerActor.Starting())
                         }
         case HostReady() => started = true
         case NewQ(q) => questions ::= q
                         println("adding:"+q)
                         host ! QuestionAdded(q)
         case ChatMessage(sender,recie,mess) => println(mess)
+        case GimmeQuestion() => playRound()
         case m => println("Unhandled message in gameActor: "+m)
     }
 
@@ -51,6 +53,7 @@ object GameActor{
     case class AddPal(pal: ActorRef, name: String)
     case class ChoosePic(pal: ActorRef, pic: String)
     case class ChangeRounds(newRounds: Int)
+    case class GimmeQuestion()
     case class Ready()
     case class HostReady()
     case class QuestionAdded(question: String)
