@@ -37,11 +37,9 @@ class Application @Inject()(cc: ControllerComponents) extends AbstractController
       val username = data("user").toString()
       val gameCode = data("code").toString()  
         if (ApplicationModel.verifyUser(gameCode, username)) {
-        println("succeeded check")
         Ok("true")
           .withSession("username" -> username, "code" -> gameCode, "csrfToken" -> play.filters.csrf.CSRF.getToken.get.value)
         } else {
-          println("Failed check")
         Ok("false")
         }
       }.getOrElse(Redirect(routes.Application.login()).flashing("error" -> "Could not verify username."))
@@ -52,11 +50,9 @@ class Application @Inject()(cc: ControllerComponents) extends AbstractController
       request.body.asJson.map { data => 
         val username = data("user").toString()
           if (ApplicationModel.verifyUser("", username)) {
-          println("succeeded check")
           Ok("true")
             .withSession("username" -> username, "code" -> "host", "csrfToken" -> play.filters.csrf.CSRF.getToken.get.value)
           } else {
-            println("Failed check")
           Ok("false")
           }
         }.getOrElse(Redirect(routes.Application.login()).flashing("error" -> "Could not verify username."))

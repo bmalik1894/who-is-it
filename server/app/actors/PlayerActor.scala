@@ -41,6 +41,11 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
                 val recie = s.split(",")(2)
                 val mess = s.split(",")(3)
                 myGame ! GameActor.ChatMessage(sender,recie,mess)
+            } else if (s.contains("ANSWER")){
+                val ans = s.split(",")(1)
+                myGame ! GameActor.Response(self,ans,0.0)
+            } else if (s == "STARTROUND"){
+                myGame ! GameActor.GimmeQuestion()
             }
         case GameCreated(game,code) => myGame = game
                                         out ! "NEWGAMECODE," + code
@@ -52,7 +57,12 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
                                            //var dummy = ""
                                            //answers.foreach(x => dummy += "/"+x._1 +"+" + x._2)
                                            out ! "ROUND,"+q 
-                                           
+        case GameStarted() => out ! "STARTGAME"
+        case CurrentUsers(people) => {
+                people.foreach(x => out ! "NEWU,"+x)
+            }
+        case NewU(u) => out ! "NEWU,"+u
+        case Winner(u) => out ! "Winner,"+u
         case m => println("Unhandled message in PlayerActor: "+m)
     }
 }
@@ -62,4 +72,8 @@ object PlayerActor{
    case class GameAdded(game:ActorRef)
    case class JoinFailed()
    case class RoundQuestion(quest:String)
+   case class GameStarted()
+   case class CurrentUsers(people: List[String])
+   case class NewU(user:String)
+   case class Winner(win:String)
 }

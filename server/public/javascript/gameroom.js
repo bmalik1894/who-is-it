@@ -14,10 +14,11 @@ document.getElementById("room-code").innerHTML = "Game Code: " + gameCode;
 
 // React create element and local datalists outside react
 const ce = React.createElement;
-let questionList = []
-let qsonBoard = []
-let userList = []
-let usonBoard = []
+let questionList = [];
+let qsonBoard = [];
+let userList = [];
+let usonBoard = [];
+let currentQuestion = "";
 
 // Opens socket through either host or player route
 if (gameCode == 'host') {
@@ -42,6 +43,16 @@ function handleMessage(data) {
     } else if (data.includes("NEWU,")) { // Recieve new User
         userList.push(data.replace("NEWU,",""))
         populateUsers();
+    } else if (data == "STARTGAME") {
+        ReactDOM.render(
+            ce(MainComponent, null, null), 
+            document.getElementById('mainroomdiv')
+        );
+    } else if (data.includes("ROUND,")) {
+        currentQuestion = data.replace("ROUND,","");
+        if(document.getElementById("currQuestion") != null) {
+            document.getElementById("currQuestion").innerHTML = currentQuestion;
+        }
     }
 }
 
@@ -64,9 +75,9 @@ function populateUsers() {
     for (const user of userList) {
         if (!usonBoard.includes(user)) {
             let userp = document.createElement("p");
-            userp.innerHTML = question;
-            udiv.appendChild(questp);
-            usonBoard.push(question);
+            userp.innerHTML = user;
+            udiv.appendChild(userp);
+            usonBoard.push(user);
         }
     }
 }
@@ -86,10 +97,6 @@ class HostWaitingRoom extends React.Component { // HOST WAITING ROOM
         }
     }
 
-    componentDidMount() {
-        this.refreshQuestions();
-    }
-
     render() {
         return ce('div', {id:"waiting-div"} ,
             ce("h2", {}, "Welcome to the Waiting Room, " + this.state.userName + "!"),
@@ -106,8 +113,11 @@ class HostWaitingRoom extends React.Component { // HOST WAITING ROOM
             ce('br'),
             ce('button', {onClick: e => this.startGame(e)}, 'Ready Up'),
             ce('button', {onClick: e => this.forceGame(e)}, 'Start Game'),
-            ce('div', {id:'userdiv', onClick: e => this.refreshUsers()}),
-            ce('div', {id:"questiondiv", onClick: e => this.refreshQuestions()})
+            ce('br'),
+            "Users:",
+            ce('div', {id:'userdiv'}),
+            "Questions:",
+            ce('div', {id:"questiondiv"})
         )}
 
         changeNewQuestion(data) {
@@ -118,16 +128,7 @@ class HostWaitingRoom extends React.Component { // HOST WAITING ROOM
             const quest = this.state.newQuestion;
             console.log(quest)
             socket.send("ADDQ," + quest);
-        }
-
-        refreshQuestions() {
-            populateQuestions();
-            this.setState({questions:questionList});
-        }
-
-        refreshUsers() {
-            populateUsers();
-            this.setState({users:userlist});
+            this.setState({newQuestion:""})
         }
 
         startGame() {
@@ -158,7 +159,11 @@ class PlayerWaitingRoom extends React.Component { // PLAYER WAITING ROOM
             ce('button', {onClick: e => this.sendQuestion(e)}, 'Send'),
             ce('br'),
             ce('button', {onClick: e => this.startGame(e)}, 'Ready Up'),
-            ce('div', {id:"questiondiv", onClick: e => this.refreshQuestions()})
+            ce('div', {id:"questiondiv", onClick: e => this.refreshQuestions()}),
+            ce('br'),
+            "Users:",
+            ce('div', {id:'userdiv', onClick: e => this.refreshUsers()}),
+            
     )}
 
     changeNewQuestion(data) {
@@ -169,6 +174,7 @@ class PlayerWaitingRoom extends React.Component { // PLAYER WAITING ROOM
         const quest = this.state.newQuestion;
         console.log(quest)
         socket.send("ADDQ," + quest);
+        this.setState({newQuestion:""})
     }
 
     refreshQuestions() {
@@ -179,13 +185,24 @@ class PlayerWaitingRoom extends React.Component { // PLAYER WAITING ROOM
     startGame() {
         socket.send("READY");
     }
+
+    refreshUsers() {
+        populateUsers();
+        this.setState({users:userList});
+    }
+
 }
 
 
 class MainComponent extends React.Component { // MAIN GAME
     constructor(props) {
       super(props);
-      this.state = { GameMessage: "", questionMessage: "", action: "", rounds: Int};
+      this.state = { 
+        GameMessage: "", 
+        questionMessage: "", 
+        action: "", 
+        rounds: 4
+        };
       }
 
       render(){
@@ -200,22 +217,64 @@ class DisplayGameComponent extends React.Component {
     constructor(props) {
       super(props); // all the data necessary for creating a game will be defined here
       this.state = {
-        players: [], 
+        players: usonBoard, 
         gameCode: "",
-        questions: [],
+        questions: qsonBoard,
+        currQuestion: "",
+        round: 1,
         errorMessage: ""
       };
     }
+
+    componentDidMount() {
+        this.grabQuestion();
+        this.addAnswers();
+    }
+
     render() {
         return ce('div', {},
-            ce("h3", null, "Round: "),
+            ce("h3", null, "Round: " + this.state.round),
             ce('br'),
-            ce('input', {type: "text", id: "txtUsernameHost", value: this.state.userName, onChange: e => this.changeUsername(e)}),
-            ce('button', {type: 'submit', id: "submitButtonHost", onClick: e => this.handleSubmit(e), value:"Submit"}, "Submit"),
-            ce('br'),
-            ce('button', {id: "goBackButtonJoin", onClick: e => this.goBack(e), value:"Go Back"}, "Go Back")
+            ce('h3',{id:"currQuestion"}, this.state.currQuestion),
+            ce('div', {id:'playerdiv'}, ""),
             );
     }
+
+    grabQuestion() {
+        if (isHost) {
+        socket.send("STARTROUND");
+        }
+        this.setState({currQuestion:currentQuestion})
+    }
+
+    addAnswers() {
+        let udiv = document.getElementById("playerdiv");    
+        let index = 1;
+        for (const player of this.state.players) {
+            let playeranswer = document.createElement('p');
+            playeranswer.innerHTML = index + '. ' + player;
+            playeranswer.onmousedown = function() {
+                socket.send("ANSWER," + player);
+                this.style.fontWeight = "bold";
+                }
+            udiv.appendChild(playeranswer);
+        }
+        this.setState({currQuestion:currentQuestion});
+    }
+}
+
+class GameOverComponent extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            whowon: ""
+        }
+    }
+     
+    render() {
+        return ce("p", {}, "GAME OVER");
+    }
+    
 }
 
 
