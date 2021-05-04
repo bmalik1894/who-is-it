@@ -111,8 +111,8 @@ class HostWaitingRoom extends React.Component { // HOST WAITING ROOM
             ce('input', {type:'text', onChange: e => this.changeNewQuestion(e)}),
             ce('button', {onClick: e => this.sendQuestion(e)}, 'Send'),
             ce('br'),
-            ce('button', {onClick: e => this.startGame(e)}, 'Ready Up'),
-            ce('button', {onClick: e => this.forceGame(e)}, 'Start Game'),
+            ce('button', {class: "btn btn-primary", onClick: e => this.startGame(e)}, 'Ready Up'),
+            ce('button', {class: "btn btn-primary", onClick: e => this.forceGame(e)}, 'Start Game'),
             ce('br'),
             "Users:",
             ce('div', {id:'userdiv'}),
@@ -256,11 +256,14 @@ class DisplayGameComponent extends React.Component {
             playeranswer.onmousedown = function() {
                 socket.send("ANSWER," + player);
                 this.style.fontWeight = "bold";
+                Array(udiv.children).map(x => x.onmousedown = null);
                 }
             udiv.appendChild(playeranswer);
+            index++;
         }
         this.setState({currQuestion:currentQuestion});
     }
+
 }
 
 class GameOverComponent extends React.Component {

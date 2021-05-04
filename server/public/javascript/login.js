@@ -16,16 +16,14 @@ class MainComponent extends React.Component {
     else if (this.state.action == "creating") {
         return ce(CreateComponent, {goBackToMain: () => this.setState({action:"main"})});
     } else {
-        return ce('div', null,
-            ce('h2', null, 'Create Game:'),
+        return ce('div', {class: "card"}, ce('div', {class: 'card-body'},
+            ce('h2', {class: "card-title"}, 'Create or Join a Game:'),
             ce('br'),
-            ce('button', {onClick: e => this.createGame(e)}, 'Create'),
+            ce('button', {class: "btn btn-primary", style: {marginRight: "20px"}, onClick: e => this.createGame(e)}, 'Create'),
             ce('span', {id: "create-message"}, this.state.createGameMessage),
-            ce('h2', null, 'Join Game:'),
-            ce('br'),
-            ce('button', {id: "join-button", onClick: e => this.joinGame(e)}, 'Join'),
+            ce('button', {id: "join-button", class: "btn btn-primary", onClick: e => this.joinGame(e)}, 'Join'),
             ce('span', {id: "join-message"}, this.state.joinGameMessage)
-            )
+            ))
         }
     }
     createGame(e) {
@@ -49,14 +47,13 @@ class CreateComponent extends React.Component {
 
 
   render() {
-
     return ce('div', {id: "ccdiv"},
-        ce("h3", null, "Name: "),
+        ce("h4", null, "Name: "),
         ce('br'),
         ce('input', {type: "text", id: "txtUsernameHost", value: this.state.userName, onChange: e => this.changeUsername(e)}), //add csrf token to header
-        ce('button', {type: 'submit', id: "submitButtonHost", onClick: e => this.handleSubmit(e), value:"Submit"}, "Submit"),
+        ce('button', {type: 'submit', id: "submitButtonHost", class: "btn btn-primary", onClick: e => this.handleSubmit(e), value:"Submit"}, "Submit"),
         ce('br'),
-        ce('button', {id: "goBackButtonJoin", onClick: e => this.goBack(e), value:"Go Back"}, "Go Back")
+        ce('button', {id: "goBackButtonJoin", class: "btn btn-secondary", onClick: e => this.goBack(e), value:"Go Back"}, "Go Back")
         );}
 
         changeUsername(e) {
@@ -109,9 +106,9 @@ class JoinComponent extends React.Component {
             ce('h3', null, "Game Code: "),
             ce('input', {type: "text", id: "txtGameCodeJoin", value: this.state.gameCode, onChange: e => this.changeGameCode(e)}),
             ce('br'),
-            ce('button', {id: "submitButtonJoin", onClick: e => this.handleSubmit(e), value:"Submit"}, "Submit"),
+            ce('button', {id: "submitButtonJoin", class: "btn btn-primary", onClick: e => this.handleSubmit(e), value:"Submit"}, "Submit"),
             ce('br'),
-            ce('button', {id: "goBackButtonJoin", onClick: e => this.goBack(e), value:"Go Back"}, "Go Back")
+            ce('button', {id: "goBackButtonJoin", class: "btn btn-secondary", onClick: e => this.goBack(e), value:"Go Back"}, "Go Back")
         );}
         
             changeGameCode(e) {

@@ -1,6 +1,6 @@
 @(user:String, state:String)(implicit request: RequestHeader)
 
-@main("Waiting Room"){
+@main("Who is it?"){
     <body style="background-color:rgba(161, 110, 209, .7)">
         <input type="hidden" id="csrfToken" value="@helper.CSRF.getToken.value">
         <input type="hidden" id="usernameInput" value="@user">
