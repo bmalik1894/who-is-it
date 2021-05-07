@@ -12,7 +12,7 @@ class MainComponent extends React.Component {
     }
 
     componentDidMount() {
-      this.audio = new Audio('server/public/sound/macintosh_plus_-_.mp3');
+      this.audio = new Audio('server/public/sound/sound.mp3');
       this.audio.load();
       this.audio.play();
       

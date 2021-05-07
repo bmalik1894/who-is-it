@@ -280,24 +280,6 @@ class GameOverComponent extends React.Component {
     }
     
 }
-class MusicComponent extends React.Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            value: 0
-        }
-    }
-    onChange = (event) => {
-        this.setState({ value: event.target.value });
-        tick.play();
-      }
-
-    render(){
-        return ce('div', {id: "music-div"},
-        ce('button', {onClick: e => this.onChange(e)}, 'Play/Pause'),
-        );
-    }
-}
 
 
 // Enter waiting room based on if you are a host or not
