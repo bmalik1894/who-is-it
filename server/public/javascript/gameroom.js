@@ -19,6 +19,12 @@ let qsonBoard = [];
 let userList = [];
 let usonBoard = [];
 let currentQuestion = "";
+let winner = "";
+let finalWinner = "";
+let finalloser = "";
+let quickdraw = "";
+let firstRound = true;
+
 
 // Opens socket through either host or player route
 if (gameCode == 'host') {
@@ -49,10 +55,37 @@ function handleMessage(data) {
             document.getElementById('mainroomdiv')
         );
     } else if (data.includes("ROUND,")) {
-        currentQuestion = data.replace("ROUND,","");
-        if(document.getElementById("currQuestion") != null) {
-            document.getElementById("currQuestion").innerHTML = currentQuestion;
+        if (currentQuestion == "") {
+            currentQuestion = data.replace("ROUND,","");
+            if(document.getElementById("currQuestion") != null) {
+                document.getElementById("currQuestion").innerHTML = currentQuestion;
+            }
+        } else {
+            currentQuestion = data.replace("ROUND,","");
+            if(document.getElementById("currQuestion") != null) {
+                document.getElementById("currQuestion").innerHTML = currentQuestion;
+            }
+            ReactDOM.render(
+                ce(MainComponent, null, null), 
+                document.getElementById('mainroomdiv')
+            );
         }
+
+    } else if (data.includes("WINNER,")) {
+        winner = data.replace("WINNER,", "");
+        ReactDOM.render(
+            ce(RoundComponent, null, null),
+            document.getElementById("mainroomdiv")
+        )
+    } else if (data.includes("GAMEOVER,")) {
+        let superlatives = data.split(",");
+        finalWinner = superlatives[1];
+        finalloser = superlatives[2];
+        quickdraw = superlatives[3];
+        ReactDOM.render(
+            ce(GameOverComponent, null, null),
+            document.getElementById("mainroomdiv")
+        )
     }
 }
 
@@ -83,7 +116,7 @@ function populateUsers() {
 }
 
 //React:
-class HostWaitingRoom extends React.Component { // HOST WAITING ROOM
+class HostWaitingRoom extends React.Component { ///////////////////////// HOST WAITING ROOM //////////////////////////////
     constructor(props) {
         super(props)
         this.state = {
@@ -140,7 +173,7 @@ class HostWaitingRoom extends React.Component { // HOST WAITING ROOM
         }
 }
 
-class PlayerWaitingRoom extends React.Component { // PLAYER WAITING ROOM
+class PlayerWaitingRoom extends React.Component { ///////////////////////////////// PLAYER WAITING ROOM //////////////////////////////
     constructor(props) {
         super(props)
         this.state = {
@@ -194,7 +227,7 @@ class PlayerWaitingRoom extends React.Component { // PLAYER WAITING ROOM
 }
 
 
-class MainComponent extends React.Component { // MAIN GAME
+class MainComponent extends React.Component { ///////////////////////////////////////////// MAIN GAME ///////////////////////////////////////////////
     constructor(props) {
       super(props);
       this.state = { 
@@ -227,7 +260,9 @@ class DisplayGameComponent extends React.Component {
     }
 
     componentDidMount() {
+        if (firstRound) {
         this.grabQuestion();
+        }
         this.addAnswers();
     }
 
@@ -263,21 +298,76 @@ class DisplayGameComponent extends React.Component {
         }
         this.setState({currQuestion:currentQuestion});
     }
+    
 
 }
 
-class GameOverComponent extends React.Component {
+class RoundComponent extends React.Component { ////////////////////////////// ROUND OVER ////////////////////////////////////////
     constructor(props) {
         super(props);
         this.state = {
             whowon: ""
         }
     }
+
+    componentDidMount() {
+        this.setState({whowon:winner})
+        firstRound = false;
+    }
      
     render() {
-        return ce("p", {}, "GAME OVER");
+
+        if (isHost) {
+        return ce('div', {id:"NextRoundDiv"},
+            ce("h3", {}, "ROUND OVER"),
+            ce("p", {}, "Winner:" + this.state.whowon),
+            ce("button", { id:"NextButton", onClick: e => this.goToNextRound()}, "Next Round"),
+            ce("button", { id:"HostNextButton", onClick: e => this.hostToNextRound()}, "Force Next Round")
+            );
+        j} else {
+            return ce('div', {id:"NextRoundDiv"},
+            ce("h3", {}, "ROUND OVER"),
+            ce("p", {}, "Winner:" + this.state.whowon),
+            ce("button", { id:"NextButton", onClick: e => this.goToNextRound()}, "Next Round"),
+            );
+        }
+    }
+
+    goToNextRound() {
+        socket.send("NEXTROUND");
+        document.getElementById("NextButton").onClick = null;
+    }
+
+    hostToNextRound() {
+        socket.send("HOSTNEXTROUND");
+        document.getElementById("NextButton").onClick = null;
+        document.getElementById("HostNextButton").onClick = null;
     }
     
+}
+
+class GameOverComponent extends React.Component { ///////////////////////////// GAME OVER /////////////////////////////////
+    constructor(props) {
+        super(props);
+        this.state = {
+            mostpopular: "",
+            fastest: "",
+            leastpopular: ""
+        }
+    }
+
+    componentDidMount() {
+        this.setState({mostpopular:finalWinner, leastpopular:finalloser, fastest:quickdraw})
+    }
+
+    render() {
+        return ce('div', {id:'gameoverdiv'},
+        ce('h3', {}, "GAME OVER"),
+        ce('p', {}, "Most Popular Player: " + this.state.mostpopular),
+        ce('p', {}, "Least Popular Player: " + this.state.leastpopular),
+        ce('p', {}, "Quickest Player:" + this.state.fastest)
+        )
+    }
 }
 
 
