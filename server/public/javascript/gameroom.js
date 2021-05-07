@@ -117,7 +117,8 @@ class HostWaitingRoom extends React.Component { // HOST WAITING ROOM
             "Users:",
             ce('div', {id:'userdiv'}),
             "Questions:",
-            ce('div', {id:"questiondiv"})
+            ce('div', {id:"questiondiv"}),
+            
         )}
 
         changeNewQuestion(data) {
@@ -273,11 +274,29 @@ class GameOverComponent extends React.Component {
             whowon: ""
         }
     }
-     
+
     render() {
         return ce("p", {}, "GAME OVER");
     }
     
+}
+class MusicComponent extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            value: 0
+        }
+    }
+    onChange = (event) => {
+        this.setState({ value: event.target.value });
+        tick.play();
+      }
+
+    render(){
+        return ce('div', {id: "music-div"},
+        ce('button', {onClick: e => this.onChange(e)}, 'Play/Pause'),
+        );
+    }
 }
 
 
