@@ -2,13 +2,14 @@
 
 const ce = React.createElement
 const csrfToken = document.getElementById("csrfToken").value;
+const song = new Audio("/versionedAssets/music/macintosh.mp3");
 
 class MainComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = { createGameMessage: "", joinGameMessage: "", action: ""};
     }
-
+    
   render() {
     if (this.state.action == "joining") {
         return ce(JoinComponent, { goBackToMain: () => this.setState({action:"main"})});
@@ -22,7 +23,10 @@ class MainComponent extends React.Component {
             ce('button', {class: "btn btn-primary", style: {marginRight: "20px"}, onClick: e => this.createGame(e)}, 'Create'),
             ce('span', {id: "create-message"}, this.state.createGameMessage),
             ce('button', {id: "join-button", class: "btn btn-primary", onClick: e => this.joinGame(e)}, 'Join'),
-            ce('span', {id: "join-message"}, this.state.joinGameMessage)
+            ce('span', {id: "join-message"}, this.state.joinGameMessage),
+            ce('br'),
+            ce('br'),
+            ce('button', {id: "music-button", onClick: e => this.playAudio(e)}, 'Play Music')
             ))
         }
     }
@@ -32,6 +36,19 @@ class MainComponent extends React.Component {
     joinGame(e) {
         this.setState({action:"joining"});
     }
+    playAudio(e) {
+      const audioPromise = song.play();
+      if (audioPromise !== undefined) {
+        audioPromise
+          .then(_ => {
+            // autoplay started
+          })
+          .catch(err => {
+            // catch dom exception
+            console.info(err)
+          });
+      };
+    };
 }
 
 class CreateComponent extends React.Component {

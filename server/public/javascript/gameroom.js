@@ -150,7 +150,8 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
             "Users:",
             ce('div', {id:'userdiv'}),
             "Questions:",
-            ce('div', {id:"questiondiv"})
+            ce('div', {id:"questiondiv"}),
+            
         )}
 
         changeNewQuestion(data) {
@@ -310,11 +311,14 @@ class RoundComponent extends React.Component { ////////////////////////////// RO
         }
     }
 
+<<<<<<< HEAD
     componentDidMount() {
         this.setState({whowon:winner})
         firstRound = false;
     }
      
+=======
+>>>>>>> jaz
     render() {
 
         if (isHost) {
