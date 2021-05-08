@@ -7,7 +7,7 @@ import collection.mutable
 import models.Player
 import scala.util.Random
 
-class GameActor(code:String,manager: ActorRef, host:ActorRef, hostName: String) extends Actor {
+class GameActor(code:String,manager: ActorRef, host:ActorRef, hostName: String, hostPic: String) extends Actor {
     val rand = Random
     private var players = List.empty[ActorRef]
     private var names = mutable.Map.empty[ActorRef,String]
@@ -24,19 +24,19 @@ class GameActor(code:String,manager: ActorRef, host:ActorRef, hostName: String) 
     private var started = false
     private var questionActive = false
     names(host) = hostName
-    pics(host) = "00"
+    pics(host) = hostPic
     manager ! GamesManager.GameMade(self,code)
     //println("Making a game its been made Weird huh?")
     host ! PlayerActor.GameCreated(self,code)
-    host !  PlayerActor.NewU(hostName)
+    host !  PlayerActor.NewU(hostName,pics(host))
     import GameActor._
     def receive = {
-        case AddPal(pal,name) => players ::= pal
+        case AddPal(pal,name,nPic) => players ::= pal
                                  names(pal) = name
-                                 pics(pal) = "00"
+                                 pics(pal) = nPic
                                  pal ! PlayerActor.GameAdded(self)
-                                 pal ! PlayerActor.CurrentUsers(names.values.toList)
-                                 players.foreach(x => x ! PlayerActor.NewU(name))
+                                 pal ! PlayerActor.CurrentUsers(players.map(x => (names(x),pics(x))))
+                                 players.foreach(x => x ! PlayerActor.NewU(name,nPic))
         case ChangeRounds(n) => println("Rounds changed to "+n)
                                 maxRounds = n
                                 rounds = n
@@ -125,17 +125,11 @@ class GameActor(code:String,manager: ActorRef, host:ActorRef, hostName: String) 
             val quick = quickest.maxBy(_._2)._1
             players.foreach(x => x ! PlayerActor.EndGame(pop,leastPop,quick))
         }
-        //Thread.sleep(30000)
-        //if(rounds > 0){
-        //    playRound()
-        //}else{
-        //    println("GAMEDONE")
-        //}
     }
 }
 
 object GameActor{
-    case class AddPal(pal: ActorRef, name: String)
+    case class AddPal(pal: ActorRef, name: String, pic: String)
     case class ChoosePic(pal: ActorRef, pic: String)
     case class ChangeRounds(newRounds: Int)
     case class GimmeQuestion()

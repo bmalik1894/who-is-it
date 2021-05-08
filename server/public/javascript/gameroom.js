@@ -27,16 +27,17 @@ let finalloser = "";
 let quickdraw = "";
 let firstRound = true;
 let numRounds = 4;
-
+let picId = currUser.split(",")[1]
+currUser = currUser.split(",")[0]
 
 // Opens socket through either host or player route
 if (gameCode == 'host') {
     isHost = true;
-    socket.onopen = (event) => socket.send("NEWGAME," + currUser);
+    socket.onopen = (event) => socket.send("NEWGAME," + currUser + "," + picId);
 } else {
     gameCode = gameCode.substring(1, gameCode.length - 1);
     document.getElementById("room-code").innerHTML = "Game Code: " + gameCode; 
-    socket.onopen = (event) => socket.send("JOIN," + gameCode + ',' + currUser);
+    socket.onopen = (event) => socket.send("JOIN," + gameCode + ',' + currUser + "," + picId);
 }
 
 // MessageHandler Function - does bulk of the work
@@ -111,8 +112,12 @@ function populateUsers() {
     for (const user of userList) {
         if (!usonBoard.includes(user)) {
             let userp = document.createElement("p");
-            userp.innerHTML = user;
+            userp.innerHTML = user.split(",")[0];
+            let useri = document.createElement("img");
+            useri.src = "versionedAssets/images/" + user.split(",")[1] + ".png";
+            udiv.appendChild(useri);
             udiv.appendChild(userp);
+
             usonBoard.push(user);
         }
     }

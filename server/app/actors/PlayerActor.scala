@@ -16,12 +16,15 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
     def receive = {
         case s:String => 
             if(s.contains("NEWGAME")){ //NEWGAME,username
-                userName = s.substring(s.indexOf(",")+1)
-                manager ! GamesManager.NewGame(self,userName)
+                val strings = s.split(",")
+                val userName = strings(1)
+                val pic = strings(2)
+                manager ! GamesManager.NewGame(self,userName,pic)
             } else if (s.contains("JOIN")){ //JOIN,code,username
-                userName = s.split(",")(2)
                 val code = s.split(",")(1)
-                manager ! GamesManager.JoinGame(self,userName,code)
+                val userName = s.split(",")(2)
+                val pic = s.split(",")(3)
+                manager ! GamesManager.JoinGame(self,userName,code,pic)
             } else if (s.contains("PIC")){ //PIC,picID
                 val picID = s.split(",")(1)
                 myGame ! GameActor.ChoosePic(self,picID)
@@ -65,9 +68,9 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
                                            out ! "ROUND,"+q 
         case GameStarted() => out ! "STARTGAME"
         case CurrentUsers(people) => {
-                people.foreach(x => out ! "NEWU,"+x)
+                people.foreach(x => out ! "NEWU,"+x._1+","+x._2)
             }
-        case NewU(u) => out ! "NEWU,"+u
+        case NewU(u,p) => out ! "NEWU,"+u+","+p
         case Winner(u) => out ! "WINNER,"+u
         case EndGame(p,lp,q) => out ! "GAMEOVER,"+p+","+lp+","+q
         case m => println("Unhandled message in PlayerActor: "+m)
@@ -80,8 +83,8 @@ object PlayerActor{
    case class JoinFailed()
    case class RoundQuestion(quest:String)
    case class GameStarted()
-   case class CurrentUsers(people: List[String])
-   case class NewU(user:String)
+   case class CurrentUsers(people: List[(String,String)])
+   case class NewU(user:String,pic:String)
    case class Winner(win:String)
    case class EndGame(pop:String,lPop:String,quick:String)
 }

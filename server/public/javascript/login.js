@@ -93,7 +93,9 @@ class CreateComponent extends React.Component {
     this.state = {
       userName: "", 
       gameCode: "",
-      errorMessage: ""
+      errorMessage: "",
+      picSrc: "versionedAssets/images/0.png",
+      picId: 0
     };
   }
 
@@ -126,7 +128,11 @@ class CreateComponent extends React.Component {
                               ce('div', {className: 'col-6'},
                                   ce('input',
                                       {className: "form-control mb-3", placeholder: "Username", type: "text", id: "txtUsernameHost", value: this.state.userName, onChange: e => this.changeUsername(e)}),
-                                )
+                                ),
+                              ce('div', {id:'pic-div'}, 
+                              ce('button', {onClick: e => this.goToPreviousPic()}, "<"),
+                              ce('img', {src: this.state.picSrc}),
+                              ce('button', {onClick: e => this.goToNextPic()}, ">"))
                           )
                       ),
                       ce('div', {className: 'card-footer'},
@@ -149,12 +155,21 @@ class CreateComponent extends React.Component {
 
         handleSubmit(event) {
           const username = this.state.userName;
+          let myPic = this.state.picId;
+
+
+          if (myPic == 0) {
+            myPic = 6
+          } else {
+            myPic = myPic - 1
+          }
+
           console.log(username)
           if (this.state.userName.length != 0) {
             fetch(validateHostRoute.value, { 
               method: 'POST', 
               headers: {'Content-Type': 'application/json', 'Csrf-Token': csrfToken }, 
-              body: JSON.stringify({user:username})
+              body: JSON.stringify({user:username + "," + myPic})
               }
             ).then(res => res.text()).then(bool => {
               if (bool == 'true') {
@@ -164,6 +179,34 @@ class CreateComponent extends React.Component {
               }
             });
             
+          }
+        }
+
+        goToPreviousPic() {
+          const tempid = this.state.picId;
+          if (tempid > 0) {
+            this.setState({picId:tempid - 1})
+            this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
+            console.log("picId: " + this.state.picId)
+          }
+           else {
+            this.setState({picId:6})
+            this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
+            console.log("picId: " + this.state.picId)
+            }
+        }
+    
+        goToNextPic() {
+          const tempid = this.state.picId;
+          if (tempid < 6) {
+            this.setState({picId:tempid + 1})
+            this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
+            console.log("picId: " + this.state.picId)
+          }
+           else {
+            this.setState({picId:0})
+            this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
+            console.log("picId: " + this.state.picId)
           }
         }
 
@@ -178,7 +221,9 @@ class JoinComponent extends React.Component {
         this.state = {
           userName: "", 
           gameCode: "",
-          errorMessage: ""
+          errorMessage: "",
+          picSrc: "versionedAssets/images/0.png",
+          picId: 0
         };
       }
 
@@ -212,11 +257,15 @@ class JoinComponent extends React.Component {
                                     ce('input',
                                         {className: "form-control mb-3", placeholder: "Game Code", type: "text", id: "txtGameCodeJoin", value: this.state.gameCode, onChange: e => this.changeGameCode(e)}),
                                     ce('input',
-                                        {className: "form-control mb-3", placeholder: "Username", type: "text", id: "txtUsernameJoin", value: this.state.userName, onChange: e => this.changeUsername(e)})
+                                        {className: "form-control mb-3", placeholder: "Username", type: "text", id: "txtUsernameJoin", value: this.state.userName, onChange: e => this.changeUsername(e)}),
+                                    ce('div', {id:'pic-div'}, 
+                                    ce('button', {onClick: e => this.goToPreviousPic()}, "<"),
+                                    ce('img', {src: this.state.picSrc}),
+                                    ce('button', {onClick: e => this.goToNextPic()}, ">"))
                                 )
                             )
                         ),
-                        ce('div', {className: 'card-footer'},
+                        ce('div', {className: 'card-footer'},    
                             ce('button',
                                 {id: "submitButtonJoin", className: "btn btn-primary me-3", onClick: e => this.handleSubmit(e), value:"Submit"},
                                 "Join"),
@@ -241,11 +290,19 @@ class JoinComponent extends React.Component {
     handleSubmit(event) {
       const username = this.state.userName;
       const gameCode = this.state.gameCode;
+      let myPic = this.state.picId;
+
+      if (myPic == 0) {
+        myPic = 6
+      } else {
+        myPic = myPic - 1
+      }
+
       if (this.state.userName.length != 0 && this.state.gameCode != 0) {
         fetch(validateJoinRoute.value, {
           method: 'POST',
           headers: {'Content-Type': 'application/json', 'Csrf-Token': csrfToken },
-          body: JSON.stringify({user:username, code:gameCode})
+          body: JSON.stringify({user:username + "," + myPic, code:gameCode})
           }
         ).then(res => res.text()).then(bool => {
           if (bool == 'true') {
@@ -254,6 +311,34 @@ class JoinComponent extends React.Component {
             this.state.errorMessage = "Failed check"
           }
         });
+      }
+    }
+
+    goToPreviousPic() {
+      const tempid = this.state.picId;
+      if (tempid > 0) {
+        this.setState({picId:tempid - 1})
+        this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
+        console.log("picId: " + this.state.picId)
+      }
+       else {
+        this.setState({picId:6})
+        this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
+        console.log("picId: " + this.state.picId)
+       }
+    }
+
+    goToNextPic() {
+      const tempid = this.state.picId;
+      if (tempid < 6) {
+        this.setState({picId:tempid + 1})
+        this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
+        console.log("picId: " + this.state.picId)
+      }
+       else {
+        this.setState({picId:0})
+        this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
+        console.log("picId: " + this.state.picId)
       }
     }
 
