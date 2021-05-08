@@ -33,7 +33,7 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
             } else if (s == "HOSTREADY"){ //HOSTREADY      (this overides wveryone else and starts the game)
                 myGame ! GameActor.HostReady()
             } else if (s.contains("ADDQ")){ //ADDQ,question
-                println("NewQ got:"+s)
+              //  println("NewQ got:"+s)
                 val quest = s.split(",")(1)
                 myGame ! GameActor.NewQ(quest)
             } else if (s.contains("CHAT")){ //CHAT,sender,recipient,message
@@ -46,6 +46,10 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
                 myGame ! GameActor.Response(self,ans,0.0)
             } else if (s == "STARTROUND"){
                 myGame ! GameActor.GimmeQuestion()
+            } else if (s == "NEXTROUND"){
+                myGame ! GameActor.NextR()
+            } else if (s == "HOSTNEXTROUND"){
+                myGame ! GameActor.HostNextR()
             }
         case GameCreated(game,code) => myGame = game
                                         out ! "NEWGAMECODE," + code
@@ -62,7 +66,8 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
                 people.foreach(x => out ! "NEWU,"+x)
             }
         case NewU(u) => out ! "NEWU,"+u
-        case Winner(u) => out ! "Winner,"+u
+        case Winner(u) => out ! "WINNER,"+u
+        case EndGame(p,lp,q) => out ! "GAMEOVER,"+p+","+lp+","+q
         case m => println("Unhandled message in PlayerActor: "+m)
     }
 }
@@ -76,4 +81,5 @@ object PlayerActor{
    case class CurrentUsers(people: List[String])
    case class NewU(user:String)
    case class Winner(win:String)
+   case class EndGame(pop:String,lPop:String,quick:String)
 }
