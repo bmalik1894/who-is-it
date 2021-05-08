@@ -26,7 +26,7 @@ class MainComponent extends React.Component {
             ce('span', {id: "join-message"}, this.state.joinGameMessage),
             ce('br'),
             ce('br'),
-            ce('button', {id: "music-button", onClick: e => this.playAudio(e)}, 'Play Music')
+            ce('button', {id: "music-button", onClick: e => this.playAudio(e)}, 'Play Music')//Need to add pause or make component for all views?
             ))
         }
     }
