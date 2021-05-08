@@ -22,9 +22,14 @@ class MainComponent extends React.Component {
                 ce('div', {class: "col-sm-8"},
                     ce('div', {class: "card"},
                         ce('div', {class: 'card-header'},
-                            ce('h5',
-                                {class: "card-title"},
-                                'Create/Join Game')
+                            ce('div', {class: 'card-title justify-content-between'},
+                                ce('h5',
+                                    null,
+                                    'Create/Join Game'),
+                                ce('a',
+                                    {id: "music-button", onClick: e => this.playAudio(e)},
+                                    ce('img', {src: "/versionedAssets/images/sound_on.png"}))
+                            )
                         ),
                         ce('div', {class: 'card-body'},
                             ce('div', {class: 'window'},
@@ -45,8 +50,7 @@ class MainComponent extends React.Component {
                                 'Join'),
                             ce('span',
                                 {id: "join-message"},
-                                this.state.joinGameMessage),
-                           ce('button', {id: "music-button", onClick: e => this.playAudio(e)}, 'Play Music')
+                                this.state.joinGameMessage)
                         )
                     )
                 )

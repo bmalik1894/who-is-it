@@ -11,8 +11,12 @@ body {
 .card-title {
     border: 4px solid #D12D4B;
     padding: 0.2rem 0.75rem;
-    font-weight: bold;
     background: #F2B4B9;
+}
+
+.card-title h5 {
+    display: inline-block;
+    font-weight: bold;
 }
 
 .card-header, .card-footer {
