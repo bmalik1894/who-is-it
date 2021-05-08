@@ -358,8 +358,6 @@ class RoundComponent extends React.Component { ////////////////////////////// RO
         this.setState({whowon:winner})
         firstRound = false;
     }
-     
-
     render() {
 
         if (isHost) {
