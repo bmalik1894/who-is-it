@@ -10,13 +10,21 @@ body {
 
 .card-title {
     border: 4px solid #D12D4B;
-    padding: 0.2rem 0.75rem;
+    padding: 0.25rem 0.75rem;
     background: #F2B4B9;
 }
 
 .card-title h5 {
-    display: inline-block;
     font-weight: bold;
+    margin-bottom: 0;
+}
+
+#music-button {
+    max-height:1.5rem;
+}
+
+#music-button:hover {
+    cursor: pointer;
 }
 
 .card-header, .card-footer {
