@@ -2,21 +2,13 @@
 
 const ce = React.createElement
 const csrfToken = document.getElementById("csrfToken").value;
-
-
+const song = new Audio("/versionedAssets/music/macintosh.mp3");
 
 class MainComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = { createGameMessage: "", joinGameMessage: "", action: ""};
     }
-
-    componentDidMount() {
-      this.audio = new Audio('server/public/sound/sound.mp3');
-      this.audio.load();
-      this.audio.play();
-      
-}
     
   render() {
     if (this.state.action == "joining") {
@@ -34,8 +26,7 @@ class MainComponent extends React.Component {
             ce('span', {id: "join-message"}, this.state.joinGameMessage),
             ce('br'),
             ce('br'),
-            ce('button', {id: "music-button", onClick: e => this.playAudio(e)}, "Play Music")
-
+            ce('button', {id: "music-button", onClick: e => this.playAudio(e)}, 'Play Music')
             ))
         }
     }
@@ -46,7 +37,7 @@ class MainComponent extends React.Component {
         this.setState({action:"joining"});
     }
     playAudio(e) {
-      const audioPromise = this.audio.play();
+      const audioPromise = song.play();
       if (audioPromise !== undefined) {
         audioPromise
           .then(_ => {
