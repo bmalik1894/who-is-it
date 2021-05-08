@@ -61,10 +61,13 @@ body {
     font-weight: bold;
 }
 
-.btn-primary:hover, .btn-primary:focus {
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
     background: #D12D4B;
     color: #ffffff;
     border: 4px solid #D12D4B;
+}
+.btn-primary:focus, .btn-primary:focus-visible {
+    box-shadow:0 0 0 .25rem #F2B4B9;
 }
 
 .btn-secondary {
@@ -74,10 +77,14 @@ body {
     border: 4px solid #D12D4B;
 }
 
-.btn-secondary:hover, .btn-secondary:focus {
+.btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active {
     background: #D12D4B;
     color: #ffffff;
     border: 4px solid #D12D4B;
+}
+
+.btn-secondary:focus, .btn-secondary:focus-visible {
+    box-shadow:0 0 0 .25rem #F2B4B9;
 }
 
 .form-control {
