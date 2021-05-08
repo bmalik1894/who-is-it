@@ -50,6 +50,8 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
                 myGame ! GameActor.NextR()
             } else if (s == "HOSTNEXTROUND"){
                 myGame ! GameActor.HostNextR()
+            }else if (s == "RESTART"){
+                myGame ! GameActor.StartAgain()
             }
         case GameCreated(game,code) => myGame = game
                                         out ! "NEWGAMECODE," + code

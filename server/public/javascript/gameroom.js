@@ -11,6 +11,8 @@ currUser = currUser.substring(1, currUser.length - 1)
 let gameCode = document.getElementById("stateInput").value;
 let isHost = false;
 document.getElementById("room-code").innerHTML = "Game Code: " + gameCode; 
+const song = new Audio("/versionedAssets/music/macintosh.mp3");
+
 
 // React create element and local datalists outside react
 const ce = React.createElement;
@@ -24,6 +26,7 @@ let finalWinner = "";
 let finalloser = "";
 let quickdraw = "";
 let firstRound = true;
+let numRounds = 4;
 
 
 // Opens socket through either host or player route
@@ -120,7 +123,7 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
     constructor(props) {
         super(props)
         this.state = {
-            numRounds: 4,
+            roundNumber: "4",
             questions: [],
             newQuestion: "",
             userName: currUser,
@@ -134,15 +137,19 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
         return ce('div', {id:"waiting-div"} ,
             ce("h2", {}, "Welcome to the Waiting Room, " + this.state.userName + "!"),
             ce('p', {}, "Number of Rounds: "),
-            ce('input', {type:'range', min:2, max:8, defaultValue:4, onChange: e => this.setState({numRounds:e})}),
-            ce('span', {value:this.state.numRounds}),
+            ce('input', {type:'range', min:2, max:8, defaultValue:4, onChange: e => this.sendRoundAmount(e)}),
+            ce('span', {}, this.state.roundNumber),
             ce('br'),
             ce('p', {}, "Round time: "),
-            ce('input', {type:'number', min:5, max:120, defaultValue:60, onChange: e => this.setState({timerLength:e})}),
+            ce('input', {type:'number', min:5, max:120, defaultValue:60, onChange: e => this.setState({timerLength:e.target.value})}),
             ce('br'),
             ce('p', {}, "Submit a Question:"),
             ce('input', {type:'text', onChange: e => this.changeNewQuestion(e)}),
             ce('button', {onClick: e => this.sendQuestion(e)}, 'Send'),
+            ce('br'),
+            ce('p', {}, "Add Question From Database:"),
+            ce("select", {id:"dbquestions", onClick: e => this.populateDBQuestions()}, ce("option", {}, "-- Select a Question --")),
+            ce('button', {onClick: e => this.addDBQ()}, "Add"),
             ce('br'),
             ce('button', {class: "btn btn-primary", onClick: e => this.startGame(e)}, 'Ready Up'),
             ce('button', {class: "btn btn-primary", onClick: e => this.forceGame(e)}, 'Start Game'),
@@ -153,6 +160,37 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
             ce('div', {id:"questiondiv"}),
             
         )}
+
+        addDBQ() {
+            let newdbq = document.getElementById("dbquestions").value
+            if (newdbq != "-- Select a Question --") {
+                socket.send("ADDQ," + newdbq);
+            }
+        }
+
+        populateDBQuestions() {
+            let allquestions = []
+            //fetch(listDBQRoute.value).then(res => res.json()).then(dbqs => allquestions = dbqs);
+            let questiondropdown = document.getElementById("dbquestions");
+            var index = 0;
+            for (var dbq of allquestions) {
+            if (questiondropdown.innerHTML.indexOf('value="' +  + '"') == -1) {
+                let newopt = document.createElement("option");
+                newopt.value = dbq;
+                newopt.text = dbq;
+                userdropdown.add(newopt, userdropdown[index]);
+                index++;
+                }
+            }
+        }
+
+        sendRoundAmount(e) {
+            this.setState({roundNumber:e.target.value});
+            socket.send("ROUNDS," + e.target.value)
+            console.log("Rounds = " + e.target.value)
+            numRounds = this.state.timerLength;
+
+        }
 
         changeNewQuestion(data) {
             this.setState({newQuestion: data.target.value});
@@ -369,7 +407,7 @@ class GameOverComponent extends React.Component { ///////////////////////////// 
         ce('h3', {}, "GAME OVER"),
         ce('p', {}, "Most Popular Player: " + this.state.mostpopular),
         ce('p', {}, "Least Popular Player: " + this.state.leastpopular),
-        ce('p', {}, "Quickest Player:" + this.state.fastest)
+        ce('p', {}, "Quickest Player: " + this.state.fastest)
         )
     }
 }
