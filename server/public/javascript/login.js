@@ -2,13 +2,14 @@
 
 const ce = React.createElement
 const csrfToken = document.getElementById("csrfToken").value;
+const song = new Audio("/versionedAssets/music/macintosh.mp3");
 
 class MainComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = { createGameMessage: "", joinGameMessage: "", action: ""};
     }
-
+    
   render() {
     if (this.state.action === "joining") {
         return ce(JoinComponent, { goBackToMain: () => this.setState({action:"main"})});
@@ -44,7 +45,8 @@ class MainComponent extends React.Component {
                                 'Join'),
                             ce('span',
                                 {id: "join-message"},
-                                this.state.joinGameMessage)
+                                this.state.joinGameMessage),
+                           ce('button', {id: "music-button", onClick: e => this.playAudio(e)}, 'Play Music')
                         )
                     )
                 )
@@ -58,6 +60,19 @@ class MainComponent extends React.Component {
     joinGame(e) {
         this.setState({action:"joining"});
     }
+    playAudio(e) {
+      const audioPromise = song.play();
+      if (audioPromise !== undefined) {
+        audioPromise
+          .then(_ => {
+            // autoplay started
+          })
+          .catch(err => {
+            // catch dom exception
+            console.info(err)
+          });
+      };
+    };
 }
 
 class CreateComponent extends React.Component {

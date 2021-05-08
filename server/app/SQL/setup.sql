@@ -12,11 +12,11 @@ CREATE TABLE UserQuestions (
 
 CREATE TABLE DefaultQuestions (
     id SERIAL PRIMARY KEY, 
-    question varchar(255) NOT NULL, 
+    question varchar(255) NOT NULL
 );
 
 CREATE TABLE Games (
 	id SERIAL PRIMARY KEY,
 	game_code varchar(6) NOT NULL,
-    rounds int4 NOT NULL,
+    rounds int4 NOT NULL
 );
