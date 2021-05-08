@@ -1,9 +1,80 @@
-/*
-input[type=text] {
-    padding: 10px;
-    border: 2px solid green;
+body {
+    background: linear-gradient(to bottom right, #C2DBF4, #C5A4D4) no-repeat center center fixed;
 }
 
-input[type=range] {
-    padding: 10px;
-}*/
+.card {
+    border-radius:0;
+    border: 4px solid #D12D4B;
+    background-color: #C2DBF4;
+}
+
+.card-title {
+    border: 4px solid #D12D4B;
+    padding: 0.2rem 0.75rem;
+    font-weight: bold;
+    background: #F2B4B9;
+}
+
+.card-header, .card-footer {
+    background: inherit;
+    border: none;
+}
+
+.card-header {
+    padding-top: 1rem;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.card-footer {
+    padding-top: 0;
+    padding-bottom: 1rem;
+}
+
+.window {
+    border: 4px solid #D12D4B;
+    padding: 0.2rem 0.75rem;
+    background: #D3C6E3;
+}
+
+.btn {
+    border-radius: 0;
+    padding: 0.1rem 0.75rem
+}
+
+.btn-primary {
+    border: 4px solid #D12D4B;
+    background: #D3C6E3;
+    color: #000000;
+    font-weight: bold;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background: #D12D4B;
+    color: #ffffff;
+    border: 4px solid #D12D4B;
+}
+
+.btn-secondary {
+    background: #F2B4B9;
+    color: #000000;
+    font-weight: bold;
+    border: 4px solid #D12D4B;
+}
+
+.btn-secondary:hover, .btn-secondary:focus {
+    background: #D12D4B;
+    color: #ffffff;
+    border: 4px solid #D12D4B;
+}
+
+.form-control {
+    border: 4px solid #D12D4B;
+    border-radius: 0;
+}
+
+.form-control:focus {
+    border: 4px solid #F2B4B9;
+    border-radius: 0;
+    box-shadow: none;
+}
