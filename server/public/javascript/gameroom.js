@@ -349,14 +349,10 @@ class RoundComponent extends React.Component { ////////////////////////////// RO
         }
     }
 
-<<<<<<< HEAD
     componentDidMount() {
         this.setState({whowon:winner})
         firstRound = false;
     }
-     
-=======
->>>>>>> jaz
     render() {
 
         if (isHost) {
