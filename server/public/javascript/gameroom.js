@@ -11,6 +11,8 @@ currUser = currUser.substring(1, currUser.length - 1)
 let gameCode = document.getElementById("stateInput").value;
 let isHost = false;
 document.getElementById("room-code").innerHTML = "Game Code: " + gameCode; 
+const song = new Audio("/versionedAssets/music/macintosh.mp3");
+
 
 // React create element and local datalists outside react
 const ce = React.createElement;
