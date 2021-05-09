@@ -19,18 +19,18 @@ class GamesManager extends Actor {
 
     def receive = {
         case NewPal(p) => pals ::= p
-        case NewGame(host,name) => {val s = generateCode()
-                                   val newGame = context.actorOf(Props(new GameActor(s, self, host, name))) 
-                                    }
+        case NewGame(host,name,pic) => {val s = generateCode()
+                                       val newGame = context.actorOf(Props(new GameActor(s, self, host, name, pic))) 
+                                       }
         case GameMade(nGame,nCode) => games(nCode) = nGame
-        case JoinGame(pal,name,code) => if(games.contains(code)){
-                                            games(code) ! GameActor.AddPal(pal,name)
-                                        }else{
-                                            games.foreach(x => println("good code:"+x))
-                                            println("failed code:"+code)
-                                            println("name:"+name)
-                                             pal ! PlayerActor.JoinFailed()
-                                             }
+        case JoinGame(pal,name,code,pic) => if(games.contains(code)){
+                                               games(code) ! GameActor.AddPal(pal,name,pic)
+                                           }else{
+                                               games.foreach(x => println("good code:"+x))
+                                               println("failed code:"+code)
+                                               println("name:"+name)
+                                              pal ! PlayerActor.JoinFailed()
+                                           }
         case m => println("Unhandled message in GamesManager: "+m)
     }
     def generateCode(): String = {
@@ -41,8 +41,8 @@ class GamesManager extends Actor {
 }
 object GamesManager{
     case class NewPal(pal: ActorRef)
-    case class NewGame(host: ActorRef,name: String)
-    case class JoinGame(pal: ActorRef,name: String, code: String)
-    case class GameMade(game: ActorRef, code:String)
+    case class NewGame(host: ActorRef,name: String,pic: String)
+    case class JoinGame(pal: ActorRef,name: String, code: String,pic: String)
+    case class GameMade(game: ActorRef, code: String)
    
 }

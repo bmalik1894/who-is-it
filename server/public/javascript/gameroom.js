@@ -26,16 +26,17 @@ let finalloser = "";
 let quickdraw = "";
 let firstRound = true;
 let numRounds = 4;
-
+let picId = currUser.split(",")[1]
+currUser = currUser.split(",")[0]
 
 // Opens socket through either host or player route
 if (gameCode == 'host') {
     isHost = true;
-    socket.onopen = (event) => socket.send("NEWGAME," + currUser);
+    socket.onopen = (event) => socket.send("NEWGAME," + currUser + "," + picId);
 } else {
     gameCode = gameCode.substring(1, gameCode.length - 1);
     //document.getElementById("room-code").innerHTML = gameCode;
-    socket.onopen = (event) => socket.send("JOIN," + gameCode + ',' + currUser);
+    socket.onopen = (event) => socket.send("JOIN," + gameCode + ',' + currUser + "," + picId);
 }
 
 // MessageHandler Function - does bulk of the work
@@ -112,11 +113,11 @@ function populateUsers() {
             let div = document.createElement("div");
             div.className = "col";
             let avatar = document.createElement("img");
-            avatar.setAttribute("src", "/versionedAssets/images/0.png");
+            avatar.setAttribute("src", "versionedAssets/images/" + user.split(",")[1] + ".png");
             avatar.className = "img-fluid";
             let paragraphTag = document.createElement("p");
             let strongTag = document.createElement("strong");
-            strongTag.innerHTML = user;
+            strongTag.innerHTML = user.split(",")[0];
             paragraphTag.appendChild(strongTag);
             div.appendChild(avatar);
             div.appendChild(paragraphTag);
