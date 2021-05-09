@@ -3,7 +3,7 @@
 const ce = React.createElement
 const csrfToken = document.getElementById("csrfToken").value;
 const song = new Audio("/versionedAssets/music/macintosh.mp3");
-
+const playing = false;
 class MainComponent extends React.Component {
   constructor(props) {
     super(props);
@@ -17,36 +17,46 @@ class MainComponent extends React.Component {
     else if (this.state.action === "creating") {
         return ce(CreateComponent, {goBackToMain: () => this.setState({action:"main"})});
     } else {
-        return ce('div', {class: "container-sm mt-2 font-monospace"},
-            ce('div', {class: "row justify-content-md-center"},
-                ce('div', {class: "col-sm-8"},
-                    ce('div', {class: "card"},
-                        ce('div', {class: 'card-header'},
-                            ce('h5',
-                                {class: "card-title"},
-                                'Create/Join Game')
+        return ce('div', {className: "container-sm mt-2 font-monospace"},
+            ce('div', {className: "row justify-content-md-center"},
+                ce('div', {className: "col-md-8"},
+                    ce('div', {className: "card"},
+                        ce('div', {className: 'card-header'},
+                            ce('div', {className: 'card-title'},
+                                ce('div', {className: 'row align-middle justify-content-between'},
+                                    ce('div', {className: 'col-auto'},
+                                        ce('h5',
+                                            null,
+                                            'Create/Join Game')
+                                    ),
+                                    ce('div', {className: 'col-auto'},
+                                        ce('img',
+                                            {src: "/versionedAssets/images/sound_on.png", id: "music-button", onClick: e => this.playAudio(e)}
+                                        )
+                                    )
+                                ),
+                            )
                         ),
-                        ce('div', {class: 'card-body'},
-                            ce('div', {class: 'window'},
+                        ce('div', {className: 'card-body'},
+                            ce('div', {className: 'window'},
                                 ce('p',
-                                    {class: "card-text my-3"},
+                                    {className: "card-text my-3"},
                                     "Welcome to Who Is It, an interactive online game that you can play with your friends! To begin, have a host create a game. Then, the host is given a join code to distribute to anyone else you want to play with. You can play with up to six players all at once."),
                             )
                         ),
-                        ce('div', {class: 'card-footer'},
+                        ce('div', {className: 'card-footer'},
                             ce('button',
-                                {class: "btn btn-primary me-3", onClick: e => this.createGame(e)},
+                                {className: "btn btn-primary me-3", onClick: e => this.createGame(e)},
                                 'Create'),
                             ce('span',
                                 {id: "create-message"},
                                 this.state.createGameMessage),
                             ce('button',
-                                {id: "join-button", class: "btn btn-primary", onClick: e => this.joinGame(e)},
+                                {id: "join-button", className: "btn btn-primary", onClick: e => this.joinGame(e)},
                                 'Join'),
                             ce('span',
                                 {id: "join-message"},
-                                this.state.joinGameMessage),
-                           ce('button', {id: "music-button", onClick: e => this.playAudio(e)}, 'Play Music')
+                                this.state.joinGameMessage)
                         )
                     )
                 )
@@ -61,10 +71,15 @@ class MainComponent extends React.Component {
         this.setState({action:"joining"});
     }
     playAudio(e) {
-      const audioPromise = song.play();
+      if(!playing)
+        const audioPromise = song.play();
+      else
+        const audioPromise = song.pause();
       if (audioPromise !== undefined) {
         audioPromise
           .then(_ => {
+              const img = document.getElementById("music-button");
+              img.setAttribute("src", "/versionedAssets/images/sound_off.png");
             // autoplay started
           })
           .catch(err => {
@@ -88,37 +103,63 @@ class CreateComponent extends React.Component {
   }
 
   render() {
-      return ce('div', {class: "container-sm mt-2 font-monospace"},
-          ce('div', {class: "row justify-content-md-center"},
-              ce('div', {class: "col-sm-8"},
-                  ce('div', {class: "card"},
-                      ce('div', {class: 'card-header'},
-                          ce('h5',
-                              {class: "card-title"},
-                              'Create Game')
-                      ),
-                      ce('div', {class: 'card-body'},
-                          ce('div', {class: 'window'},
-                              ce('p',
-                                  {class: "card-text my-3"},
-                                  "Enter the username you want to use below, then click submit to create a game."),
-                              ce('div', {class: 'col-6'},
-                                  ce('input',
-                                      {class: "form-control mb-3", placeholder: "Username", type: "text", id: "txtUsernameHost", value: this.state.userName, onChange: e => this.changeUsername(e)}),
-                                )
+      return ce('div', {className: "container-sm mt-2 font-monospace"},
+          ce('div', {className: "row justify-content-md-center"},
+              ce('div', {className: "col-md-8"},
+                  ce('div', {className: "card"},
+                      ce('div', {className: 'card-header'},
+                          ce('div', {className: 'card-title'},
+                              ce('div', {className: 'row align-middle justify-content-between'},
+                                  ce('div', {className: 'col-auto'},
+                                      ce('h5',
+                                          null,
+                                          'Create Game')
+                                  ),
+                                  ce('div', {className: 'col-auto'},
+                                      ce('img',
+                                          {src: "/versionedAssets/images/sound_on.png", id: "music-button", onClick: e => this.playAudio(e)}
+                                      )
+                                  )
+                              ),
                           )
                       ),
-                      ce('div', {id:'pic-div'}, 
-                          ce('button', {onClick: e => this.goToPreviousPic()}, "<"),
-                          ce('img', {src: this.state.picSrc}),
-                          ce('button', {onClick: e => this.goToNextPic()}, ">"),
+                      ce('div', {className: 'card-body'},
+                          ce('div', {className: 'window'},
+                              ce('p',
+                                  {className: "card-text my-3"},
+                                  "Enter the username you want to use below, then click submit to create a game."),
+                              ce('div', {className: 'col-8'},
+                                ce('input',
+                                    {className: "form-control mb-3", placeholder: "Username", type: "text", id: "txtUsernameHost", value: this.state.userName, onChange: e => this.changeUsername(e)}),
+                                ce('div', {id:'pic-div', className: 'row row-cols-3 my-3'}, 
+                                  ce('div', {className: 'col'}, 
+                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/1.png", onClick: e => this.setState({picId:1})}),
+                                  ), 
+                                  ce('div', {className: 'col'}, 
+                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/2.png", onClick: e => this.setState({picId:2})}),
+                                  ), 
+                                  ce('div', {className: 'col'}, 
+                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/3.png", onClick: e => this.setState({picId:3})}),
+                                  ),
+                                  ce('div', {className: 'col'}, 
+                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/4.png", onClick: e => this.setState({picId:4})}),
+                                  ),
+                                  ce('div', {className: 'col'}, 
+                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/5.png", onClick: e => this.setState({picId:5})}),
+                                  ),
+                                  ce('div', {className: 'col'}, 
+                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/6.png", onClick: e => this.setState({picId:6})}),
+                                  ),
+                                )
+                              ),
+                          )
                       ),
-                      ce('div', {class: 'card-footer'},
+                      ce('div', {className: 'card-footer'},
                           ce('button',
-                              {type: 'submit', id: "submitButtonHost", class: "btn btn-primary me-3", onClick: e => this.handleSubmit(e), value:"Submit"},
+                              {type: 'submit', id: "submitButtonHost", className: "btn btn-primary me-3", onClick: e => this.handleSubmit(e), value:"Submit"},
                               'Create'),
                           ce('button',
-                              {id: "goBackButtonJoin", class: "btn btn-secondary", onClick: e => this.goBack(e), value:"Go Back"},
+                              {id: "goBackButtonJoin", className: "btn btn-secondary", onClick: e => this.goBack(e), value:"Go Back"},
                               'Back'),
                       )
                   )
@@ -134,13 +175,6 @@ class CreateComponent extends React.Component {
         handleSubmit(event) {
           const username = this.state.userName;
           let myPic = this.state.picId;
-
-
-          if (myPic == 0) {
-            myPic = 6
-          } else {
-            myPic = myPic - 1
-          }
 
           console.log(username)
           if (this.state.userName.length != 0) {
@@ -206,39 +240,65 @@ class JoinComponent extends React.Component {
       }
 
     render() {
-        return ce('div', {class: "container-sm mt-2 font-monospace"},
-            ce('div', {class: "row justify-content-md-center"},
-                ce('div', {class: "col-sm-8"},
-                    ce('div', {class: "card"},
-                        ce('div', {class: 'card-header'},
-                            ce('h5',
-                                {class: "card-title"},
-                                'Join Game')
+        return ce('div', {className: "container-sm mt-2 font-monospace"},
+            ce('div', {className: "row justify-content-md-center"},
+                ce('div', {className: "col-md-8"},
+                    ce('div', {className: "card"},
+                        ce('div', {className: 'card-header'},
+                            ce('div', {className: 'card-title'},
+                                ce('div', {className: 'row align-middle justify-content-between'},
+                                    ce('div', {className: 'col-auto'},
+                                        ce('h5',
+                                            null,
+                                            'Join Game')
+                                    ),
+                                    ce('div', {className: 'col-auto'},
+                                        ce('img',
+                                            {src: "/versionedAssets/images/sound_on.png", id: "music-button", onClick: e => this.playAudio(e)}
+                                        )
+                                    )
+                                ),
+                            )
                         ),
-                        ce('div', {class: 'card-body'},
-                            ce('div', {class: 'window'},
+                        ce('div', {className: 'card-body'},
+                            ce('div', {className: 'window'},
                                 ce('p',
-                                    {class: "card-text my-3"},
+                                    {className: "card-text my-3"},
                                     "Enter your host's game code and the name you would like to use, then click join."),
-                                ce('div', {class: 'col-6'},
+                                ce('div', {className: 'col-6'},
                                     ce('input',
-                                        {class: "form-control mb-3", placeholder: "Game Code", type: "text", id: "txtGameCodeJoin", value: this.state.gameCode, onChange: e => this.changeGameCode(e)}),
+                                        {className: "form-control mb-3", placeholder: "Game Code", type: "text", id: "txtGameCodeJoin", value: this.state.gameCode, onChange: e => this.changeGameCode(e)}),
                                     ce('input',
-                                        {class: "form-control mb-3", placeholder: "Username", type: "text", id: "txtUsernameJoin", value: this.state.userName, onChange: e => this.changeUsername(e)})
+                                        {className: "form-control mb-3", placeholder: "Username", type: "text", id: "txtUsernameJoin", value: this.state.userName, onChange: e => this.changeUsername(e)}),
+                                        ce('div', {className: 'col-8'},
+                                        ce('div', {id:'pic-div', className: 'row row-cols-3 my-3'}, 
+                                          ce('div', {className: 'col'}, 
+                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/1.png", onClick: e => this.setState({picId:1})}),
+                                          ), 
+                                          ce('div', {className: 'col'}, 
+                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/2.png", onClick: e => this.setState({picId:2})}),
+                                          ), 
+                                          ce('div', {className: 'col'}, 
+                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/3.png", onClick: e => this.setState({picId:3})}),
+                                          ),
+                                          ce('div', {className: 'col'}, 
+                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/4.png", onClick: e => this.setState({picId:4})}),
+                                          ),
+                                          ce('div', {className: 'col'}, 
+                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/5.png", onClick: e => this.setState({picId:5})}),
+                                          ),
+                                          ce('div', {className: 'col'}, 
+                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/6.png", onClick: e => this.setState({picId:6})}),
+                                          ),
                                 )
                             )
                         ),
-                        ce('div', {id:'pic-div'}, 
-                          ce('button', {onClick: e => this.goToPreviousPic()}, "<"),
-                          ce('img', {src: this.state.picSrc}),
-                          ce('button', {onClick: e => this.goToNextPic()}, ">"),
-                        ),
-                        ce('div', {class: 'card-footer'},
+                        ce('div', {className: 'card-footer'},    
                             ce('button',
-                                {id: "submitButtonJoin", class: "btn btn-primary me-3", onClick: e => this.handleSubmit(e), value:"Submit"},
+                                {id: "submitButtonJoin", className: "btn btn-primary me-3", onClick: e => this.handleSubmit(e), value:"Submit"},
                                 "Join"),
                             ce('button',
-                                {id: "goBackButtonJoin", class: "btn btn-secondary", onClick: e => this.goBack(e), value:"Go Back"},
+                                {id: "goBackButtonJoin", className: "btn btn-secondary", onClick: e => this.goBack(e), value:"Go Back"},
                                 "Back")
                         )
                     )

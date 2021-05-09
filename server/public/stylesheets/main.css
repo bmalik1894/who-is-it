@@ -1,4 +1,9 @@
 body {
+    background: url('/versionedAssets/images/grid.png') repeat top left;
+    /*  no-repeat center center fixed*/
+}
+
+html {
     background: linear-gradient(to bottom right, #C2DBF4, #C5A4D4) no-repeat center center fixed;
 }
 
@@ -10,9 +15,21 @@ body {
 
 .card-title {
     border: 4px solid #D12D4B;
-    padding: 0.2rem 0.75rem;
-    font-weight: bold;
+    padding: 0.25rem 0.75rem;
     background: #F2B4B9;
+}
+
+.card-title h5 {
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+#music-button {
+    max-height:1.5rem;
+}
+
+#music-button:hover {
+    cursor: pointer;
 }
 
 .card-header, .card-footer {
@@ -49,10 +66,13 @@ body {
     font-weight: bold;
 }
 
-.btn-primary:hover, .btn-primary:focus {
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active {
     background: #D12D4B;
     color: #ffffff;
     border: 4px solid #D12D4B;
+}
+.btn-primary:focus, .btn-primary:focus-visible {
+    box-shadow:0 0 0 .25rem #F2B4B9;
 }
 
 .btn-secondary {
@@ -62,10 +82,14 @@ body {
     border: 4px solid #D12D4B;
 }
 
-.btn-secondary:hover, .btn-secondary:focus {
+.btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active, .btn-secondary .active {
     background: #D12D4B;
     color: #ffffff;
     border: 4px solid #D12D4B;
+}
+
+.btn-secondary:focus, .btn-secondary:focus-visible {
+    box-shadow:0 0 0 .25rem #F2B4B9;
 }
 
 .form-control {
@@ -77,4 +101,8 @@ body {
     border: 4px solid #F2B4B9;
     border-radius: 0;
     box-shadow: none;
+}
+
+.img-active {
+    border: 4px solid #D12D4B;
 }
