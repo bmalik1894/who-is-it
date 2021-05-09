@@ -10,7 +10,6 @@ let currUser = document.getElementById("usernameInput").value;
 currUser = currUser.substring(1, currUser.length - 1)
 let gameCode = document.getElementById("stateInput").value;
 let isHost = false;
-document.getElementById("room-code").innerHTML = "Game Code: " + gameCode; 
 const song = new Audio("/versionedAssets/music/macintosh.mp3");
 
 
@@ -35,7 +34,7 @@ if (gameCode == 'host') {
     socket.onopen = (event) => socket.send("NEWGAME," + currUser);
 } else {
     gameCode = gameCode.substring(1, gameCode.length - 1);
-    document.getElementById("room-code").innerHTML = "Game Code: " + gameCode; 
+    //document.getElementById("room-code").innerHTML = gameCode;
     socket.onopen = (event) => socket.send("JOIN," + gameCode + ',' + currUser);
 }
 
@@ -45,7 +44,7 @@ function handleMessage(data) {
     console.log(data);
     if (data.includes("NEWGAMECODE,")) { // Recieve Code 
         gameCode = data.replace("NEWGAMECODE,","");
-        document.getElementById("room-code").innerHTML = "Game Code: " + gameCode; 
+        document.getElementById("room-code").innerHTML = gameCode;
     } else if (data.includes("NEWQ")) { // Recieve new Question
         questionList.push(data.replace("NEWQ,",""));
         populateQuestions();
@@ -107,12 +106,21 @@ function populateQuestions() {
 
 // Populate Users
 function populateUsers() {
-    let udiv = document.getElementById("userdiv");
+    let usersDiv = document.getElementById("users-div");
     for (const user of userList) {
         if (!usonBoard.includes(user)) {
-            let userp = document.createElement("p");
-            userp.innerHTML = user;
-            udiv.appendChild(userp);
+            let div = document.createElement("div");
+            div.className = "col";
+            let avatar = document.createElement("img");
+            avatar.setAttribute("src", "/versionedAssets/images/0.png");
+            avatar.className = "img-fluid";
+            let paragraphTag = document.createElement("p");
+            let strongTag = document.createElement("strong");
+            strongTag.innerHTML = user;
+            paragraphTag.appendChild(strongTag);
+            div.appendChild(avatar);
+            div.appendChild(paragraphTag);
+            usersDiv.appendChild(div);
             usonBoard.push(user);
         }
     }
@@ -134,82 +142,164 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
     }
 
     render() {
-        return ce('div', {id:"waiting-div"} ,
-            ce("h2", {}, "Welcome to the Waiting Room, " + this.state.userName + "!"),
-            ce('p', {}, "Number of Rounds: "),
-            ce('input', {type:'range', min:2, max:8, defaultValue:4, onChange: e => this.sendRoundAmount(e)}),
-            ce('span', {}, this.state.roundNumber),
-            ce('br'),
-            ce('p', {}, "Round time: "),
-            ce('input', {type:'number', min:5, max:120, defaultValue:60, onChange: e => this.setState({timerLength:e.target.value})}),
-            ce('br'),
-            ce('p', {}, "Submit a Question:"),
-            ce('input', {type:'text', onChange: e => this.changeNewQuestion(e)}),
-            ce('button', {onClick: e => this.sendQuestion(e)}, 'Send'),
-            ce('br'),
-            ce('p', {}, "Add Question From Database:"),
-            ce("select", {id:"dbquestions", onClick: e => this.populateDBQuestions()}, ce("option", {}, "-- Select a Question --")),
-            ce('button', {onClick: e => this.addDBQ()}, "Add"),
-            ce('br'),
-            ce('button', {class: "btn btn-primary", onClick: e => this.startGame(e)}, 'Ready Up'),
-            ce('button', {class: "btn btn-primary", onClick: e => this.forceGame(e)}, 'Start Game'),
-            ce('br'),
-            "Users:",
-            ce('div', {id:'userdiv'}),
-            "Questions:",
-            ce('div', {id:"questiondiv"}),
-            
-        )}
+        return ce('div', {className: "container-sm mt-2 font-monospace"},
+            ce('div', {className: "row justify-content-md-center row-eq-height"},
+                ce('div', {className: "col-lg-6"},
+                    ce('div', {className: "card mb-3"},
+                        ce('div', {className: 'card-header'},
+                            ce('div', {className: 'card-title'},
+                                ce('div', {className: 'row align-middle justify-content-between'},
+                                    ce('div', {className: 'col-auto'},
+                                        ce('h5',
+                                            null,
+                                            'Waiting for players...')
+                                    ),
+                                    ce('div', {className: 'col-auto'},
+                                        ce('img',
+                                            {src: "/versionedAssets/images/sound_on.png", id: "music-button", onClick: e => this.playAudio(e)}
+                                        )
+                                    )
+                                ),
+                            )
+                        ),
+                        ce('div', {className: 'card-body'},
+                            ce('div', {className: 'window'},
+                                ce('p',
+                                    {className: "card-text my-3"},
+                                    "Welcome, " + this.state.userName + "! As the host, you can select number of rounds, times, and approve/add questions to play with. When you're ready to go, click Ready. The game will begin when all players are ready. Alternatively, click Start to force the game to start immediately."),
+                                ce('div', {className: 'row mb-3'},
+                                    ce('div', {className: 'col'},
+                                        ce('label', {className: 'form-label', for: 'roundTime'}, "Round time: "),
+                                    ),
+                                    ce('div', {className: 'col'},
+                                        ce('input', {className: 'form-control', id: 'roundTime', type:'number', min:5, max:120, defaultValue:60, onChange: e => this.setState({timerLength:e.target.value})}),
+                                    )
+                                ),
+                                ce('div', {className: 'row'},
+                                    ce('div', {className: 'col'},
+                                        ce('label', {className: 'form-label', for:'roundRange'}, "Number of Rounds: " + this.state.roundNumber)
+                                    ),
+                                    ce('div', {className: 'col'},
+                                        ce('input', {className: 'form-range', id: 'roundRange', type:'range', min:2, max:8, defaultValue:4, onChange: e => this.sendRoundAmount(e)})
+                                    )
+                                ),
+                                ce('div', {className: 'd-flex align-items-center my-3'},
+                                    ce('div', {className: 'flex-shrink-0'},
+                                        ce('img', {src: '/versionedAssets/images/join.png'})
+                                    ),
+                                    ce('div', {className: 'flex-grow-1 ms-3'},
+                                        ce('p', {style:{marginBottom: "0"}},
+                                            ce('strong', {className: 'user-select-all', id: 'room-code'}, gameCode)
+                                        )
+                                    )
+                                ),
+                                ce('div', {className: 'row justify-content-md-center'},
+                                    ce('div', {className: 'col-sm-8'},
+                                        ce('div', {className: 'row row-cols-3', id:'users-div', onClick: e => this.refreshUsers()})
+                                    )
+                                )
+                            )
+                        ),
+                        ce('div', {className: 'card-footer'},
+                            ce('button',
+                                {className: "btn btn-primary me-3", id: "ready-game", onClick: e => this.startGame(e)},
+                                "Ready"),
+                            ce('button',
+                                {className: "btn btn-primary me-3", onClick: e => this.forceGame(e)},
+                                "Start")
+                        )
+                    )
+                ),
+                ce('div', {className: "col-lg-4"},
+                    ce('div', {className: "card"},
+                        ce('div', {className: 'card-header'},
+                            ce('div', {className: 'card-title'},
+                                ce('div', {className: 'row align-middle justify-content-between'},
+                                    ce('div', {className: 'col-auto'},
+                                        ce('h5',
+                                            null,
+                                            'Questions')
+                                    ),
+                                ),
+                            )
+                        ),
+                        ce('div', {className: 'card-body'},
+                            ce('div', {className: 'window'},
+                                ce('p',
+                                    {className: "card-text my-3"},
+                                    "Submit a question to be used in the game."),
+                                // Host didn't have onClick previously; idk if they need this?
+                                ce('div', {id:"questiondiv", onClick: e => this.refreshQuestions()})
+                            )
+                        ),
+                        ce('div', {className: 'card-footer'},
+                            ce('div', {className: 'input-group mb-3'},
+                                ce("select", {className: 'form-select',id:"dbquestions", onClick: e => this.populateDBQuestions()}, ce("option", null, "Add from database")),
+                                ce('button', {className: 'btn btn-secondary',onClick: e => this.addDBQ()}, "Add")
+                            ),
+                            ce('input',
+                                {className: "form-control mb-3", type: "text", placeholder: "Question", onChange: e => this.changeNewQuestion(e)}),
+                            ce('button',
+                                {className: "btn btn-primary me-3", onClick: e => this.sendQuestion(e)},
+                                "Submit"),
+                        )
+                    )
+                )
+            )
+        )
+    }
 
-        addDBQ() {
-            let newdbq = document.getElementById("dbquestions").value
-            if (newdbq != "-- Select a Question --") {
-                socket.send("ADDQ," + newdbq);
+    addDBQ() {
+        let newdbq = document.getElementById("dbquestions").value
+        if (newdbq !== "Add from database") {
+            socket.send("ADDQ," + newdbq);
+        }
+    }
+
+    populateDBQuestions() {
+        let allquestions = []
+        //fetch(listDBQRoute.value).then(res => res.json()).then(dbqs => allquestions = dbqs);
+        let questiondropdown = document.getElementById("dbquestions");
+        var index = 0;
+        for (var dbq of allquestions) {
+        if (questiondropdown.innerHTML.indexOf('value="' +  + '"') == -1) {
+            let newopt = document.createElement("option");
+            newopt.value = dbq;
+            newopt.text = dbq;
+            userdropdown.add(newopt, userdropdown[index]);
+            index++;
             }
         }
+    }
 
-        populateDBQuestions() {
-            let allquestions = []
-            //fetch(listDBQRoute.value).then(res => res.json()).then(dbqs => allquestions = dbqs);
-            let questiondropdown = document.getElementById("dbquestions");
-            var index = 0;
-            for (var dbq of allquestions) {
-            if (questiondropdown.innerHTML.indexOf('value="' +  + '"') == -1) {
-                let newopt = document.createElement("option");
-                newopt.value = dbq;
-                newopt.text = dbq;
-                userdropdown.add(newopt, userdropdown[index]);
-                index++;
-                }
-            }
-        }
+    sendRoundAmount(e) {
+        this.setState({roundNumber:e.target.value});
+        socket.send("ROUNDS," + e.target.value)
+        console.log("Rounds = " + e.target.value)
+        numRounds = this.state.timerLength;
 
-        sendRoundAmount(e) {
-            this.setState({roundNumber:e.target.value});
-            socket.send("ROUNDS," + e.target.value)
-            console.log("Rounds = " + e.target.value)
-            numRounds = this.state.timerLength;
+    }
 
-        }
+    changeNewQuestion(data) {
+        this.setState({newQuestion: data.target.value});
+    }
 
-        changeNewQuestion(data) {
-            this.setState({newQuestion: data.target.value});
-        }
+    sendQuestion() {
+        const quest = this.state.newQuestion;
+        console.log(quest)
+        socket.send("ADDQ," + quest);
+        this.setState({newQuestion:""})
+    }
 
-        sendQuestion() {
-            const quest = this.state.newQuestion;
-            console.log(quest)
-            socket.send("ADDQ," + quest);
-            this.setState({newQuestion:""})
-        }
+    startGame() {
+        socket.send("READY");
+        const readyButton = document.getElementById("ready-game");
+        readyButton.className = "btn btn-primary me-3 active";
+    }
 
-        startGame() {
-            socket.send("READY");
-        }
-
-        forceGame() {
-            socket.send("HOSTREADY");
-        }
+    forceGame() {
+        socket.send("HOSTREADY");
+    }
 }
 
 class PlayerWaitingRoom extends React.Component { ///////////////////////////////// PLAYER WAITING ROOM //////////////////////////////
@@ -223,20 +313,88 @@ class PlayerWaitingRoom extends React.Component { //////////////////////////////
     }
 
     render() {
-        return ce('div', {id:"waiting-div"} ,
-            ce("h2", {}, "Welcome to the Waiting Room, " + this.state.userName + "!"),
-            ce('br'),
-            ce('p', {}, "Submit a Question:"),
-            ce('input', {type:'text', onChange: e => this.changeNewQuestion(e)}),
-            ce('button', {onClick: e => this.sendQuestion(e)}, 'Send'),
-            ce('br'),
-            ce('button', {onClick: e => this.startGame(e)}, 'Ready Up'),
-            ce('div', {id:"questiondiv", onClick: e => this.refreshQuestions()}),
-            ce('br'),
-            "Users:",
-            ce('div', {id:'userdiv', onClick: e => this.refreshUsers()}),
-            
-    )}
+        return ce('div', {className: "container-sm mt-2 font-monospace"},
+            ce('div', {className: "row justify-content-md-center row-eq-height"},
+                ce('div', {className: "col-lg-6"},
+                    ce('div', {className: "card mb-3"},
+                        ce('div', {className: 'card-header'},
+                            ce('div', {className: 'card-title'},
+                                ce('div', {className: 'row align-middle justify-content-between'},
+                                    ce('div', {className: 'col-auto'},
+                                        ce('h5',
+                                            null,
+                                            'Waiting for players...')
+                                    ),
+                                    ce('div', {className: 'col-auto'},
+                                        ce('img',
+                                            {src: "/versionedAssets/images/sound_on.png", id: "music-button", onClick: e => this.playAudio(e)}
+                                        )
+                                    )
+                                ),
+                            )
+                        ),
+                        ce('div', {className: 'card-body'},
+                            ce('div', {className: 'window'},
+                                ce('p',
+                                    {className: "card-text my-3"},
+                                    "Welcome, " + this.state.userName + "! Click ready when you're ready to start playing. The game will begin when the host starts the game, or everyone is ready."),
+                                ce('div', {className: 'd-flex align-items-center mb-3'},
+                                    ce('div', {className: 'flex-shrink-0'},
+                                        ce('img', {src: '/versionedAssets/images/join.png'})
+                                    ),
+                                    ce('div', {className: 'flex-grow-1 ms-3'},
+                                        ce('p', {style:{marginBottom: "0"}},
+                                            ce('strong', {className: 'user-select-all', id: 'room-code'}, gameCode)
+                                        )
+                                    )
+                                ),
+                                ce('div', {className: 'row justify-content-md-center'},
+                                    ce('div', {className: 'col-sm-8'},
+                                        ce('div', {className: 'row row-cols-3', id:'users-div', onClick: e => this.refreshUsers()})
+                                    )
+                                )
+                            )
+                        ),
+                        ce('div', {className: 'card-footer'},
+                            ce('button',
+                                {className: "btn btn-primary me-3", id: "ready-game", onClick: e => this.startGame(e), value:"Ready"},
+                                "Ready"),
+                        )
+                    )
+                ),
+                ce('div', {className: "col-lg-4"},
+                    ce('div', {className: "card"},
+                        ce('div', {className: 'card-header'},
+                            ce('div', {className: 'card-title'},
+                                ce('div', {className: 'row align-middle justify-content-between'},
+                                    ce('div', {className: 'col-auto'},
+                                        ce('h5',
+                                            null,
+                                            'Questions')
+                                    ),
+                                ),
+                            )
+                        ),
+                        ce('div', {className: 'card-body'},
+                            ce('div', {className: 'window'},
+                                ce('p',
+                                    {className: "card-text my-3"},
+                                    "Submit a question to be used in the game."),
+                                ce('div', {id:"questiondiv", onClick: e => this.refreshQuestions()})
+                            )
+                        ),
+                        ce('div', {className: 'card-footer'},
+                            ce('input',
+                                {className: "form-control mb-3", type: "text", placeholder: "Question", onChange: e => this.changeNewQuestion(e)}),
+                            ce('button',
+                                {className: "btn btn-primary me-3", onClick: e => this.sendQuestion(e)},
+                                "Submit"),
+                        )
+                    )
+                )
+            )
+        )
+    }
 
     changeNewQuestion(data) {
         this.setState({newQuestion: data.target.value});
@@ -256,6 +414,8 @@ class PlayerWaitingRoom extends React.Component { //////////////////////////////
 
     startGame() {
         socket.send("READY");
+        const readyButton = document.getElementById("ready-game");
+        readyButton.className = "btn btn-primary me-3 active";
     }
 
     refreshUsers() {
