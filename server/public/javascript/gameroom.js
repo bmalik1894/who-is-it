@@ -331,9 +331,9 @@ class DisplayGameComponent extends React.Component {
         let index = 1;
         for (const player of this.state.players) {
             let playeranswer = document.createElement('p');
-            playeranswer.innerHTML = index + '. ' + player;
+            playeranswer.innerHTML = index + '. ' + player.split(",")[0];
             playeranswer.onmousedown = function() {
-                socket.send("ANSWER," + player);
+                socket.send("ANSWER," + player.split(",")[0]);
                 this.style.fontWeight = "bold";
                 Array(udiv.children).map(x => x.onmousedown = null);
                 }
@@ -355,10 +355,10 @@ class RoundComponent extends React.Component { ////////////////////////////// RO
     }
 
     componentDidMount() {
-        this.setState({whowon:winner})
+        this.setState({whowon:winner.split(",")[0]})
         firstRound = false;
     }
-     
+
 
     render() {
 
