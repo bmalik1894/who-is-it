@@ -1,4 +1,9 @@
 body {
+    background: url('/versionedAssets/images/grid.png') repeat top left;
+    /*  no-repeat center center fixed*/
+}
+
+html {
     background: linear-gradient(to bottom right, #C2DBF4, #C5A4D4) no-repeat center center fixed;
 }
 

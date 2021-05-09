@@ -169,7 +169,7 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
                                     "Welcome, " + this.state.userName + "! As the host, you can select number of rounds, times, and approve/add questions to play with. When you're ready to go, click Ready. The game will begin when all players are ready. Alternatively, click Start to force the game to start immediately."),
                                 ce('div', {className: 'row mb-3'},
                                     ce('div', {className: 'col'},
-                                        ce('label', {className: 'form-label', for: 'roundTime'}, "Round time: "),
+                                        ce('label', {className: 'form-label', htmlFor: 'roundTime'}, "Round time: "),
                                     ),
                                     ce('div', {className: 'col'},
                                         ce('input', {className: 'form-control', id: 'roundTime', type:'number', min:5, max:120, defaultValue:60, onChange: e => this.setState({timerLength:e.target.value})}),
@@ -177,7 +177,7 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
                                 ),
                                 ce('div', {className: 'row'},
                                     ce('div', {className: 'col'},
-                                        ce('label', {className: 'form-label', for:'roundRange'}, "Number of Rounds: " + this.state.roundNumber)
+                                        ce('label', {className: 'form-label', htmlFor:'roundRange'}, "Number of Rounds: " + this.state.roundNumber)
                                     ),
                                     ce('div', {className: 'col'},
                                         ce('input', {className: 'form-range', id: 'roundRange', type:'range', min:2, max:8, defaultValue:4, onChange: e => this.sendRoundAmount(e)})
