@@ -1,5 +1,6 @@
 "use strict"
-
+const song = new Audio("/versionedAssets/music/macintosh.mp3");
+let playing = false;
 // Creates websocket
 const socketRoute = document.getElementById("ws-route").value;
 let websock = (location.protocol == "https:") ? socketRoute.replace("http","wss") : socketRoute.replace("http", "ws");
@@ -139,6 +140,7 @@ class HostWaitingRoom extends React.Component { // HOST WAITING ROOM
         forceGame() {
             socket.send("HOSTREADY");
         }
+        
 }
 
 class PlayerWaitingRoom extends React.Component { // PLAYER WAITING ROOM
@@ -234,12 +236,29 @@ class DisplayGameComponent extends React.Component {
 
     render() {
         return ce('div', {},
+        ce('button', {id: "music-button", onClick: e => this.playAudio(e)}, 'Play Music'),
             ce("h3", null, "Round: " + this.state.round),
             ce('br'),
             ce('h3',{id:"currQuestion"}, this.state.currQuestion),
             ce('div', {id:'playerdiv'}, ""),
             );
     }
+    playAudio(e) {
+        if(!playing)
+        const audioPromise = song.play();
+        else
+            audioPromise = song.pause();
+        if (audioPromise !== undefined) {
+          audioPromise
+            .then(_ => {
+              // autoplay started
+            })
+            .catch(err => {
+              // catch dom exception
+              console.info(err)
+            });
+        };
+      };
 
     grabQuestion() {
         if (isHost) {

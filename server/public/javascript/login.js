@@ -2,7 +2,7 @@
 
 const ce = React.createElement
 const csrfToken = document.getElementById("csrfToken").value;
-const song = new Audio("/versionedAssets/music/macintosh.mp3");
+
 
 class MainComponent extends React.Component {
   constructor(props) {
@@ -26,7 +26,6 @@ class MainComponent extends React.Component {
             ce('span', {id: "join-message"}, this.state.joinGameMessage),
             ce('br'),
             ce('br'),
-            ce('button', {id: "music-button", onClick: e => this.playAudio(e)}, 'Play Music')
             ))
         }
     }
@@ -36,19 +35,6 @@ class MainComponent extends React.Component {
     joinGame(e) {
         this.setState({action:"joining"});
     }
-    playAudio(e) {
-      const audioPromise = song.play();
-      if (audioPromise !== undefined) {
-        audioPromise
-          .then(_ => {
-            // autoplay started
-          })
-          .catch(err => {
-            // catch dom exception
-            console.info(err)
-          });
-      };
-    };
 }
 
 class CreateComponent extends React.Component {
