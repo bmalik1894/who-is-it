@@ -6,11 +6,11 @@ import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import collection.mutable
 import scala.util.Random
-
+import models.DatabaseModel
 import GameActor._
+import scala.concurrent.ExecutionContext
 
-
-class GamesManager extends Actor {
+class GamesManager(dbModel: DatabaseModel)(implicit ec: ExecutionContext) extends Actor {
     import GamesManager._
     private var pals = List.empty[ActorRef]
     private var games = mutable.Map.empty[String, ActorRef]
@@ -20,7 +20,7 @@ class GamesManager extends Actor {
     def receive = {
         case NewPal(p) => pals ::= p
         case NewGame(host,name,pic) => {val s = generateCode()
-                                       val newGame = context.actorOf(Props(new GameActor(s, self, host, name, pic))) 
+                                       val newGame = context.actorOf(Props(new GameActor(s, self, host, name, pic, dbModel))) 
                                        }
         case GameMade(nGame,nCode) => games(nCode) = nGame
         case JoinGame(pal,name,code,pic) => if(games.contains(code)){
@@ -39,7 +39,7 @@ class GamesManager extends Actor {
           else code
     }
 }
-object GamesManager{
+object GamesManager {
     case class NewPal(pal: ActorRef)
     case class NewGame(host: ActorRef,name: String,pic: String)
     case class JoinGame(pal: ActorRef,name: String, code: String,pic: String)

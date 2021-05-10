@@ -13,9 +13,19 @@ import akka.stream.Materializer
 import akka.actor.Props
 import actors._
 
+import play.api.db.slick.DatabaseConfigProvider
+import slick.jdbc.JdbcProfile
+import slick.jdbc.PostgresProfile.api._
+import scala.concurrent.ExecutionContext
+import play.api.db.slick.HasDatabaseConfigProvider
+import models.DatabaseModel
+
 @Singleton
-class WebSocketApp @Inject()(cc: ControllerComponents)(implicit system: ActorSystem, mat:Materializer) extends AbstractController(cc) { 
-    val manager = system.actorOf(Props[GamesManager], "Manager")
+class WebSocketApp @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, cc: ControllerComponents)(implicit system: ActorSystem, mat:Materializer, ec: ExecutionContext) 
+    extends AbstractController(cc) with HasDatabaseConfigProvider[JdbcProfile] { 
+    
+    val model = new DatabaseModel(db)
+    val manager = system.actorOf(Props(new GamesManager(model)), "Manager")
 
     
     def socket = WebSocket.accept[String,String] { request =>

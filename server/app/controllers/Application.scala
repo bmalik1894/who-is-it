@@ -11,12 +11,6 @@ import play.api.libs.json
 import play.api.libs.json._
 import models._
 
-import play.api.db.slick.DatabaseConfigProvider
-import slick.jdbc.JdbcProfile
-import slick.jdbc.PostgresProfile.api._
-import scala.concurrent.ExecutionContext
-import play.api.db.slick.HasDatabaseConfigProvider
-
 @Singleton
 //class Application @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, cc: ControllerComponents)(implicit ec: ExecutionContext) 
 //  extends AbstractController(cc) with HasDatabaseConfigProvider[JdbcProfile] {
