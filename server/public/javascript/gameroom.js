@@ -128,11 +128,22 @@ function populateUsers() {
     }
 }
 
-// Add generic questions
-function addGenericQuestions() {
-    for (let i = 0; i < 12; i++) {
+// Add generic questions for debugging
+function addGenericQuestions(number) {
+    for (let i = 1; i <= number; i++) {
         socket.send("ADDQ,Question " + i);
     }
+}
+
+// get picId from username
+function getPicIdFromUsername(username) {
+    for (let i = 0; i < userList.length; i++) {
+        if (userList[i].split(",")[0] == username) {
+            console.log("found pic from user " + userList[i]);
+            return userList[i].split(",")[1];
+        }
+    }
+    return 0;
 }
 
 
@@ -477,8 +488,7 @@ class DisplayGameComponent extends React.Component {
         questions: qsonBoard,
         currQuestion: "",
         round: currRound,
-        errorMessage: "",
-        chosenAnswer: false
+        errorMessage: ""
       };
     }
 
@@ -542,27 +552,20 @@ class DisplayGameComponent extends React.Component {
         this.setState({currQuestion:currentQuestion});
     }
 
-    haveIChosenAnswer() {
-        this.state.chosenAnswer;
-    }
-
-    chooseAnswer() {
-        this.setState({chosenAnswer:true})
-    }
-    
-
 }
 
 class RoundComponent extends React.Component { ////////////////////////////// ROUND OVER ////////////////////////////////////////
     constructor(props) {
         super(props);
         this.state = {
-            whowon: ""
+            whowon: "",
+            whowonpic: 0,
+            ready: false
         }
     }
 
     componentDidMount() {
-        this.setState({whowon:winner.split(",")[0]})
+        this.setState({whowon:winner, whowonpic:getPicIdFromUsername(winner)})
         firstRound = false;
     }
 
@@ -572,22 +575,32 @@ class RoundComponent extends React.Component { ////////////////////////////// RO
         if (isHost) {
         return ce('div', {id:"NextRoundDiv"},
             ce("h3", {}, "ROUND OVER"),
-            ce("p", {}, "Winner:" + this.state.whowon),
+            ce("div", {}, 
+                ce('p', {}, "Winner:"),
+                ce('img', {src:"versionedAssets/images/" + this.state.whowonpic + ".png"}),
+                ce('p', {}, this.state.whowon)
+            ),
             ce("button", { id:"NextButton", onClick: e => this.goToNextRound()}, "Next Round"),
             ce("button", { id:"HostNextButton", onClick: e => this.hostToNextRound()}, "Force Next Round")
             );
         j} else {
             return ce('div', {id:"NextRoundDiv"},
             ce("h3", {}, "ROUND OVER"),
-            ce("p", {}, "Winner:" + this.state.whowon),
+            ce("div", {}, 
+                ce('p', {}, "Winner:"),
+                ce('img', {src:"versionedAssets/images/" + this.state.whowonpic + ".png"}),
+                ce('p', {}, this.state.whowon)
+            ),
             ce("button", { id:"NextButton", onClick: e => this.goToNextRound()}, "Next Round"),
             );
         }
     }
 
     goToNextRound() {
-        socket.send("NEXTROUND");
-        document.getElementById("NextButton").onClick = null;
+        if (!this.state.ready) {
+            socket.send("NEXTROUND");
+            this.setState({ready:true});
+        }
     }
 
     hostToNextRound() {
