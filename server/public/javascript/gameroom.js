@@ -128,6 +128,14 @@ function populateUsers() {
     }
 }
 
+// Add generic questions
+function addGenericQuestions() {
+    for (let i = 0; i < 12; i++) {
+        socket.send("ADDQ,Question " + i);
+    }
+}
+
+
 //React:
 class HostWaitingRoom extends React.Component { ///////////////////////// HOST WAITING ROOM //////////////////////////////
     constructor(props) {
@@ -503,19 +511,43 @@ class DisplayGameComponent extends React.Component {
         let udiv = document.getElementById("playerdiv");    
         let index = 1;
         for (const player of this.state.players) {
-            let playeranswer = document.createElement('p');
-            playeranswer.innerHTML = index + '. ' + player.split(",")[0];
-            playeranswer.onmousedown = function() {
-                if (!this.state.chosenAnswer) {
-                socket.send("ANSWER," + player.split(",")[0]);
-                this.style.fontWeight = "bold";
-                this.setState({chosenAnswer:true})
+            let playerdiv = document.createElement("div");
+            playerdiv.active = false;
+            playerdiv.onclick = function() {
+                const allanswers = this.parentElement.children;
+                let anyclicked = false;
+                for (let i = 0; i < allanswers.length; i++) {
+                    if (allanswers[i].active) {
+                        anyclicked = true;
+                    }
                 }
+                
+                if (!anyclicked) {
+                    socket.send("ANSWER," + player.split(",")[0]);
+                    this.style.fontWeight = "bold";
+                    this.active = true;    
                 }
-            udiv.appendChild(playeranswer);
+            }
+
+            let playername = document.createElement('p');
+            playername.innerHTML = index + '. ' + player.split(",")[0]; 
             index++;
+            let playerpic = document.createElement('img');
+            playerpic.src = "versionedAssets/images/" + player.split(",")[1] + ".png";    
+            playerdiv.appendChild(playerpic);
+            playerdiv.appendChild(playername);
+
+            udiv.appendChild(playerdiv);
         }
         this.setState({currQuestion:currentQuestion});
+    }
+
+    haveIChosenAnswer() {
+        this.state.chosenAnswer;
+    }
+
+    chooseAnswer() {
+        this.setState({chosenAnswer:true})
     }
     
 
