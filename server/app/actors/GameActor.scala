@@ -7,18 +7,21 @@ import collection.mutable
 import models.Player
 import scala.util.Random
 import controllers.Application
+import models.DatabaseModel
+import scala.concurrent.ExecutionContext
 
-class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String, hostPic: String) extends Actor {
+
+class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String, hostPic: String, dbModel:DatabaseModel)(implicit ec: ExecutionContext) extends Actor {
     val rand = Random
-    private val GameCode = code
+    private val gameCode = code
     private var players = List.empty[ActorRef]
     private var names = mutable.Map.empty[ActorRef,String]
     private var pics = mutable.Map.empty[ActorRef,String]
     private var choices = mutable.Map.empty[String,Int]
     private var mostPopular = mutable.Map.empty[String,Int]
     private var quickest = mutable.Map.empty[String,Int]
-    private var rounds = 8
-    private var maxRounds = 8
+    private var rounds = 12
+    private var maxRounds = 12
     private var questions = List.empty[String] //temporary holding questioins
     players ::= host
     private var ready = 0
@@ -100,18 +103,21 @@ class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String,
         names.values.foreach(x => quickest(x) = 0)
         var numQ = maxRounds - questions.length
         questions.foreach(x => enterQtoDB(x))
-        // DatabaseModel.getQuestions(numQ)
-        //DatabaseModel.addGame(GameCode,MaxRounds)
+        dbModel.getQuestions(numQ, None).foreach(x => x.foreach(k => addQuestion(k)))
+        dbModel.addGame(gameCode,maxRounds)
         players.foreach(x => x ! PlayerActor.GameStarted())
+    }
+    def addQuestion(question: String): Unit ={
+        questions ::= question;
     }
     def reStartGame(): Unit = {
         names.values.foreach(x => mostPopular(x) = 0)
         names.values.foreach(x => quickest(x) = 0)
-        //DatabaseModel.getQuestions(maxRounds,code)
+        dbModel.getQuestions(maxRounds,Some(code)).foreach(x => x.foreach(k => addQuestion(k)))
         playRound();
     }
     def enterQtoDB(question: String):Unit ={
-       // DatabaseModel.addUserQuestion(question, gameCode)
+        dbModel.addUserQuestion(question, gameCode)
     }
     def upVinDB(question: String):Unit = {
 
