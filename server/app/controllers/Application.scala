@@ -18,11 +18,12 @@ import scala.concurrent.ExecutionContext
 import play.api.db.slick.HasDatabaseConfigProvider
 
 @Singleton
-class Application @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, cc: ControllerComponents)(implicit ec: ExecutionContext) 
-  extends AbstractController(cc) with HasDatabaseConfigProvider[JdbcProfile] {
+//class Application @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, cc: ControllerComponents)(implicit ec: ExecutionContext) 
+//  extends AbstractController(cc) with HasDatabaseConfigProvider[JdbcProfile] {
+class Application @Inject()(cc: ControllerComponents) extends AbstractController(cc) { 
 
 
-    private val model = new DatabaseModel(db)
+ //   private val model = new DatabaseModel(db)
 
   def login = Action { implicit request =>
     Ok(views.html.login())
@@ -72,17 +73,17 @@ class Application @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
   }
 
   def addUserQDB(question: String, code: String):Unit = {
-
+    ???
   }
 
   def getQuestion(code: String, numQ: Int): List[String] = {
-
+    ???
   }
 
   def upVDB(question: String, code: String):Unit = {
-
+    ???
   }
   def downVDB(question: String, code: String):Unit ={
-
+    ???
   }
 }

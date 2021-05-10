@@ -6,7 +6,7 @@ import akka.actor.ActorRef
 import collection.mutable
 import models.Player
 import scala.util.Random
-import models.Application
+import controllers.Application
 
 class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String, hostPic: String) extends Actor {
     val rand = Random

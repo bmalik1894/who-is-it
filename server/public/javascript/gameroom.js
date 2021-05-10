@@ -25,7 +25,8 @@ let finalWinner = "";
 let finalloser = "";
 let quickdraw = "";
 let firstRound = true;
-let numRounds = 4;
+let numRounds = 12;
+let currRound = 0;
 let picId = currUser.split(",")[1]
 currUser = currUser.split(",")[0]
 
@@ -138,7 +139,8 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
             userName: currUser,
             picId: -1,
             timerLength: 60,
-            errorMessage: ""
+            errorMessage: "",
+            ready: false
         }
     }
 
@@ -277,6 +279,11 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
         this.setState({roundNumber:e.target.value});
         socket.send("ROUNDS," + e.target.value)
         numRounds = this.state.timerLength;
+    }
+
+    sendTimerAmount(e) {
+        this.setState({timerLength:e.target.value});
+        socket.send("TIMER," + e.target.value);
 
     }
 
@@ -292,9 +299,12 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
     }
 
     startGame() {
+        if (!this.state.ready) {
         socket.send("READY");
         const readyButton = document.getElementById("ready-game");
         readyButton.className = "btn btn-primary me-3 active";
+        this.setState({ready:true})
+        }
     }
 
     forceGame() {
@@ -308,7 +318,8 @@ class PlayerWaitingRoom extends React.Component { //////////////////////////////
         this.state = {
             userName: currUser,
             picId: -1,
-            errorMessage: ""
+            errorMessage: "",
+            ready: false
         }
     }
 
@@ -413,9 +424,13 @@ class PlayerWaitingRoom extends React.Component { //////////////////////////////
     }
 
     startGame() {
+        if (!this.state.ready) {
         socket.send("READY");
         const readyButton = document.getElementById("ready-game");
         readyButton.className = "btn btn-primary me-3 active";
+        this.setState({ready:true});    
+        }
+        
     }
 
     refreshUsers() {
@@ -453,16 +468,19 @@ class DisplayGameComponent extends React.Component {
         gameCode: "",
         questions: qsonBoard,
         currQuestion: "",
-        round: 1,
-        errorMessage: ""
+        round: currRound,
+        errorMessage: "",
+        chosenAnswer: false
       };
     }
 
     componentDidMount() {
+        currRound = currRound += 1
         if (firstRound) {
         this.grabQuestion();
         }
         this.addAnswers();
+        this.setState({round: currRound})
     }
 
     render() {
@@ -488,9 +506,11 @@ class DisplayGameComponent extends React.Component {
             let playeranswer = document.createElement('p');
             playeranswer.innerHTML = index + '. ' + player.split(",")[0];
             playeranswer.onmousedown = function() {
+                if (!this.state.chosenAnswer) {
                 socket.send("ANSWER," + player.split(",")[0]);
                 this.style.fontWeight = "bold";
-                Array(udiv.children).map(x => x.onmousedown = null);
+                this.setState({chosenAnswer:true})
+                }
                 }
             udiv.appendChild(playeranswer);
             index++;

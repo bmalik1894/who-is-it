@@ -4,6 +4,7 @@ const ce = React.createElement
 const csrfToken = document.getElementById("csrfToken").value;
 const song = new Audio("/versionedAssets/music/macintosh.mp3");
 const playing = false;
+let audioPromise = null;
 class MainComponent extends React.Component {
   constructor(props) {
     super(props);
@@ -64,18 +65,20 @@ class MainComponent extends React.Component {
         )
         }
     }
+
     createGame(e) {
         this.setState({action:"creating"});
     }
     joinGame(e) {
         this.setState({action:"joining"});
     }
+
     playAudio(e) {
-      if(!playing)
-        const audioPromise = song.play();
-      else
-        const audioPromise = song.pause();
-      if (audioPromise !== undefined) {
+      if(!playing) {
+        audioPromise = song.play();
+      } else {
+        audioPromise = song.pause();
+      } if (audioPromise !== undefined) {
         audioPromise
           .then(_ => {
               const img = document.getElementById("music-button");
@@ -88,6 +91,7 @@ class MainComponent extends React.Component {
           });
       };
     };
+
 }
 
 class CreateComponent extends React.Component {
@@ -221,6 +225,25 @@ class CreateComponent extends React.Component {
             console.log("picId: " + this.state.picId)
           }
         }
+        
+        playAudio(e) {
+          if(!playing) {
+            audioPromise = song.play();
+          } else {
+            audioPromise = song.pause();
+          } if (audioPromise !== undefined) {
+            audioPromise
+              .then(_ => {
+                  const img = document.getElementById("music-button");
+                  img.setAttribute("src", "/versionedAssets/images/sound_off.png");
+                // autoplay started
+              })
+              .catch(err => {
+                // catch dom exception
+                console.info(err)
+              });
+          };
+        };
 
         goBack(e) {
           this.props.goBackToMain();
@@ -305,6 +328,8 @@ class JoinComponent extends React.Component {
                 )
             )
         )
+            )
+        )
     }
         
     changeGameCode(e) {
@@ -336,7 +361,7 @@ class JoinComponent extends React.Component {
           if (bool == 'true') {
             window.location.href = "/startGame"
           } else {
-            this.state.errorMessage = "Failed check"
+            this.state.errorMessage = "Invalid gamecode or username already taken"
           }
         });
       }
@@ -369,6 +394,25 @@ class JoinComponent extends React.Component {
         console.log("picId: " + this.state.picId)
       }
     }
+
+    playAudio(e) {
+      if(!playing) {
+        audioPromise = song.play();
+      } else {
+        audioPromise = song.pause();
+      } if (audioPromise !== undefined) {
+        audioPromise
+          .then(_ => {
+              const img = document.getElementById("music-button");
+              img.setAttribute("src", "/versionedAssets/images/sound_off.png");
+            // autoplay started
+          })
+          .catch(err => {
+            // catch dom exception
+            console.info(err)
+          });
+      };
+    };
 
     goBack(e) {
       this.props.goBackToMain();
