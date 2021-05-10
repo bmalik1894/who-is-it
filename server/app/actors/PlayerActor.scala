@@ -21,9 +21,10 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
                 val pic = strings(2)
                 manager ! GamesManager.NewGame(self,userName,pic)
             } else if (s.contains("JOIN")){ //JOIN,code,username
-                val code = s.split(",")(1)
-                val userName = s.split(",")(2)
-                val pic = s.split(",")(3)
+                val strings = s.split(",")
+                val code = strings(1)
+                val userName = strings(2)
+                val pic = strings(3)
                 manager ! GamesManager.JoinGame(self,userName,code,pic)
             } else if (s.contains("PIC")){ //PIC,picID
                 val picID = s.split(",")(1)
@@ -40,9 +41,10 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
                 val quest = s.split(",")(1)
                 myGame ! GameActor.NewQ(quest)
             } else if (s.contains("CHAT")){ //CHAT,sender,recipient,message
-                val sender = s.split(",")(1)
-                val recie = s.split(",")(2)
-                val mess = s.split(",")(3)
+                val strings = s.split(",")
+                val sender = strings(1)
+                val recie = strings(2)
+                val mess = strings(3)
                 myGame ! GameActor.ChatMessage(sender,recie,mess)
             } else if (s.contains("ANSWER")){
                 val ans = s.split(",")(1)

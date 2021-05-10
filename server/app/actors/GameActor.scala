@@ -31,7 +31,6 @@ class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String,
     names(host) = hostName
     pics(host) = hostPic
     manager ! GamesManager.GameMade(self,code)
-    //println("Making a game its been made Weird huh?")
     host ! PlayerActor.GameCreated(self,code)
     host !  PlayerActor.NewU(hostName,pics(host))
     import GameActor._
@@ -72,7 +71,7 @@ class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String,
         case DownvoteQ(q) => downVinDB(q)
         case m => println("Unhandled message in gameActor: "+m)
     }
-
+    //This chooses a question and sends it out to all the players. If there are no questions to ask, it ends the game early
     def playRound(): Unit = {
         if (questions.length > 0) {
             var rQuestion = ""
@@ -97,7 +96,8 @@ class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String,
             players.foreach(x => x ! PlayerActor.EndGame(pop,leastPop,quick))
         }
     }
-
+    //starts the game. It sets all the quickest and most popular counts to 0 and if it needs more questions it requests them from the database
+    //It also adds the current game with its questions to the database
     def startGame():Unit = {
         names.values.foreach(x => mostPopular(x) = 0)
         names.values.foreach(x => quickest(x) = 0)
@@ -110,6 +110,7 @@ class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String,
     def addQuestion(question: String): Unit ={
         questions ::= question;
     }
+    //restarts the game with the settings and questions it already had. 
     def reStartGame(): Unit = {
         names.values.foreach(x => mostPopular(x) = 0)
         names.values.foreach(x => quickest(x) = 0)
@@ -125,6 +126,8 @@ class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String,
     def downVinDB(question: String):Unit = {
 
     }
+    //receives a response from a player and increases the count for their choice
+    //It checks if it has seen a response from each player and ends the round if it has
     def enterResponse(sender: ActorRef, choice: String, time: Double): Unit = {
         if(questionActive){
             if(choice != "NoChoice"){
@@ -141,6 +144,9 @@ class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String,
             }
         }
     }
+    //Ends a round. It finds the "winner" who got the most votes. 
+    //It sends everyone the winner, decreases the number of rounds, and checks to see if the game is over.
+    //If there are no more rounds it finds the superlatives and sends out the end of game message
     def endRound():Unit={
         println("we have "+rounds + "rounds left!")
         val max = choices.maxBy(_._2)._1
