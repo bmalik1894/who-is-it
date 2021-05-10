@@ -2,22 +2,22 @@ package  models
 
 import slick.jdbc.PostgresProfile.api._
 import scala.concurrent.ExecutionContext
-// import models.Tables._
+import models.Tables._
 import scala.concurrent.Future
 import scala.util.Random
 
 // Notes: id is the row id for each table in SQL; game_id is the forein key for the id of a game row
 //        gameCode is the 6-letter string used to identify each game by the actor system
 class DatabaseModel(db: Database)(implicit ec: ExecutionContext) {
-    /*
+    
     // Adds a game if it doesn't exist already
     def addGame(gameCode: String, numRounds: Int): Future[Option[Int]] = {
-        val matches = db.run(Games.filter(gameRow => gameRow.game_code === gameCode).result)
+        val matches = db.run(Games.filter(gameRow => gameRow.gameCode === gameCode).result)
         matches.flatMap { gameRows =>
             if (gameRows.isEmpty) {
                 db.run(Games += GamesRow(-1, gameCode, numRounds))
                 .flatMap { addCount =>
-                    if (addCount > 0) db.run(GameRows.filter(gameRow => gameRow.game_code === gameCode).result)
+                    if (addCount > 0) db.run(Games.filter(gameRow => gameRow.gameCode === gameCode).result)
                     .map(_.headOption.map(_.id))
                     else Future.successful(None)
                 }
@@ -27,19 +27,19 @@ class DatabaseModel(db: Database)(implicit ec: ExecutionContext) {
 
     // Add question to the default questions database
     def addDefaultQuestion(question: String): Future[Int] = {
-        db.run(DefaultQuestions += DefaultQuestionsRow(-1, question))
+        db.run(Defaultquestions += DefaultquestionsRow(-1, question))
     }
 
     // Add question to the user questions database if the game ID exists
     // Currently this function may return a Future of Option of the number of questions associated with the game;
     def addUserQuestion(question: String, gameCode: String): Future[Option[Int]] = {
-        val matches = db.run(Games.filter(gameRow => gameRow.game_code === gameCode).result)
+        val matches = db.run(Games.filter(gameRow => gameRow.gameCode === gameCode).result)
         matches.flatMap { gameRows => 
             val gameId = gameRows(1).id
             if (gameRows.nonEmpty) {
-                db.run(UserQuestions += UserQuestionsRow(-1, question, gameId))
+                db.run(Userquestions += UserquestionsRow(-1, question, gameId))
                 .flatMap { addCount => 
-                    if (addCount > 0) db.run(UserQuestionsRows.filter(userQuestionRow => userQuestionRow.game_id === gameId).result)
+                    if (addCount > 0) db.run(Userquestions.filter(userQuestionRow => userQuestionRow.gameId === gameId).result)
                     .map(_.headOption.map(_.id))
                     else Future.successful(None)
                 }
@@ -53,8 +53,8 @@ class DatabaseModel(db: Database)(implicit ec: ExecutionContext) {
     def getUserQuestions(gameCode: String): Future[Seq[String]] = {
         db.run(
         (for {
-            game <- Games if game.game_code === gameCode
-            userQuestion <- UserQuestions if userQuestion.game_id === game.id
+            game <- Games if game.gameCode === gameCode
+            userQuestion <- Userquestions if userQuestion.gameId === game.id
         } yield {
             userQuestion
         }).result
@@ -64,7 +64,7 @@ class DatabaseModel(db: Database)(implicit ec: ExecutionContext) {
     // This should get all questions from the default database
     def getDefaultQuestions: Future[Seq[String]] = {
         db.run(
-            (for (defaultQuestion <- DefaultQuestions) yield {
+            (for (defaultQuestion <- Defaultquestions) yield {
                 defaultQuestion
             }).result
         ).map(defaultQuestions => defaultQuestions.map(_.question))
@@ -76,25 +76,28 @@ class DatabaseModel(db: Database)(implicit ec: ExecutionContext) {
     // Shuffling is an extremely inefficient way to get random items
     def getQuestions(number: Int, gameCode: Option[String]): Future[Seq[String]] = {
         gameCode match {
-            case None => getDefaultQuestions(number)
+            case None => getDefaultQuestions.map(qs => scala.util.Random.shuffle(qs).take(number))
             case Some(id: String) => {
-                val userQuestions = getUserQuestions(id).map(qs => scala.util.Random.shuffle(qs))
+                val userQuestions = getUserQuestions(id)
                 val defaultQuestions = getDefaultQuestions.map(qs => scala.util.Random.shuffle(qs))
-                val uqLength = userQuestions.length()
-                if (uqLength > number) {
-                    userQuestions.map(_.take(number))
-                } else if (uqLength == number) {
-                    userQuestions
-                } else {
-                    // Absolutely zero clue if this will work...
-                    val diff = number - uqLength
-                    val newseq = Seq(defaultQuestions.map(_.take(diff)), userQuestions)
-                    newseq.flatMap(_.flatMap(_))
-                    // somehow have to add userQuestions and getDefaultQuestions(number - uqLength) since they're both futures
-                }
-                
+                // Everything below here is pretty broken and messy. Might work better to combine everything I guess?
+                var allQuestions: Future[Seq[String]] = Future(Seq[String](""))
+                val newUserQuestions = userQuestions.map(qs => {
+                    if (qs.length > number) {
+                        qs.take(number)
+                    } else if (qs.length == number) {
+                        qs
+                    } else {
+                        // Absolutely zero clue if this will work...
+                        val diff = number - qs.length
+                        allQuestions = defaultQuestions.map(dqs => dqs.take(diff) ++ qs)
+                        // Future(Sequence) though it needs to be a sequence
+                        qs
+                        // somehow have to add userQuestions and getDefaultQuestions(number - uqLength) since they're both futures
+                    }
+                })
+                allQuestions
             }
         }
     }
-*/
 }

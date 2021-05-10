@@ -25,7 +25,8 @@ let finalWinner = "";
 let finalloser = "";
 let quickdraw = "";
 let firstRound = true;
-let numRounds = 4;
+let numRounds = 12;
+let currRound = 0;
 let picId = currUser.split(",")[1]
 currUser = currUser.split(",")[0]
 
@@ -132,13 +133,14 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
     constructor(props) {
         super(props)
         this.state = {
-            roundNumber: "4",
+            roundNumber: "12",
             questions: [],
             newQuestion: "",
             userName: currUser,
             picId: -1,
             timerLength: 60,
-            errorMessage: ""
+            errorMessage: "",
+            ready: false
         }
     }
 
@@ -181,7 +183,7 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
                                         ce('label', {className: 'form-label', htmlFor:'roundRange'}, "Number of Rounds: " + this.state.roundNumber)
                                     ),
                                     ce('div', {className: 'col'},
-                                        ce('input', {className: 'form-range', id: 'roundRange', type:'range', min:2, max:8, defaultValue:4, onChange: e => this.sendRoundAmount(e)})
+                                        ce('input', {className: 'form-range', id: 'roundRange', type:'range', min:8, max:16, defaultValue:12, onChange: e => this.sendRoundAmount(e)})
                                     )
                                 ),
                                 ce('div', {className: 'd-flex align-items-center my-3'},
@@ -234,10 +236,10 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
                             )
                         ),
                         ce('div', {className: 'card-footer'},
-                            ce('div', {className: 'input-group mb-3'},
-                                ce("select", {className: 'form-select',id:"dbquestions", onClick: e => this.populateDBQuestions()}, ce("option", null, "Add from database")),
-                                ce('button', {className: 'btn btn-secondary',onClick: e => this.addDBQ()}, "Add")
-                            ),
+                        //     ce('div', {className: 'input-group mb-3'},
+                        //         ce("select", {className: 'form-select',id:"dbquestions", onClick: e => this.populateDBQuestions()}, ce("option", null, "Add from database")),
+                        //         ce('button', {className: 'btn btn-secondary',onClick: e => this.addDBQ()}, "Add")
+                        //     ),
                             ce('input',
                                 {className: "form-control mb-3", type: "text", placeholder: "Question", onChange: e => this.changeNewQuestion(e)}),
                             ce('button',
@@ -276,8 +278,12 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
     sendRoundAmount(e) {
         this.setState({roundNumber:e.target.value});
         socket.send("ROUNDS," + e.target.value)
-        console.log("Rounds = " + e.target.value)
         numRounds = this.state.timerLength;
+    }
+
+    sendTimerAmount(e) {
+        this.setState({timerLength:e.target.value});
+        socket.send("TIMER," + e.target.value);
 
     }
 
@@ -293,9 +299,12 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
     }
 
     startGame() {
+        if (!this.state.ready) {
         socket.send("READY");
         const readyButton = document.getElementById("ready-game");
         readyButton.className = "btn btn-primary me-3 active";
+        this.setState({ready:true})
+        }
     }
 
     forceGame() {
@@ -309,7 +318,8 @@ class PlayerWaitingRoom extends React.Component { //////////////////////////////
         this.state = {
             userName: currUser,
             picId: -1,
-            errorMessage: ""
+            errorMessage: "",
+            ready: false
         }
     }
 
@@ -414,9 +424,13 @@ class PlayerWaitingRoom extends React.Component { //////////////////////////////
     }
 
     startGame() {
+        if (!this.state.ready) {
         socket.send("READY");
         const readyButton = document.getElementById("ready-game");
         readyButton.className = "btn btn-primary me-3 active";
+        this.setState({ready:true});    
+        }
+        
     }
 
     refreshUsers() {
@@ -454,16 +468,19 @@ class DisplayGameComponent extends React.Component {
         gameCode: "",
         questions: qsonBoard,
         currQuestion: "",
-        round: 1,
-        errorMessage: ""
+        round: currRound,
+        errorMessage: "",
+        chosenAnswer: false
       };
     }
 
     componentDidMount() {
+        currRound = currRound += 1
         if (firstRound) {
         this.grabQuestion();
         }
         this.addAnswers();
+        this.setState({round: currRound})
     }
 
     render() {
@@ -487,11 +504,13 @@ class DisplayGameComponent extends React.Component {
         let index = 1;
         for (const player of this.state.players) {
             let playeranswer = document.createElement('p');
-            playeranswer.innerHTML = index + '. ' + player;
+            playeranswer.innerHTML = index + '. ' + player.split(",")[0];
             playeranswer.onmousedown = function() {
-                socket.send("ANSWER," + player);
+                if (!this.state.chosenAnswer) {
+                socket.send("ANSWER," + player.split(",")[0]);
                 this.style.fontWeight = "bold";
-                Array(udiv.children).map(x => x.onmousedown = null);
+                this.setState({chosenAnswer:true})
+                }
                 }
             udiv.appendChild(playeranswer);
             index++;
@@ -511,9 +530,11 @@ class RoundComponent extends React.Component { ////////////////////////////// RO
     }
 
     componentDidMount() {
-        this.setState({whowon:winner})
+        this.setState({whowon:winner.split(",")[0]})
         firstRound = false;
     }
+
+
     render() {
 
         if (isHost) {

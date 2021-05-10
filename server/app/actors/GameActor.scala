@@ -6,17 +6,19 @@ import akka.actor.ActorRef
 import collection.mutable
 import models.Player
 import scala.util.Random
+import controllers.Application
 
-class GameActor(code:String,manager: ActorRef, host:ActorRef, hostName: String, hostPic: String) extends Actor {
+class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String, hostPic: String) extends Actor {
     val rand = Random
+    private val GameCode = code
     private var players = List.empty[ActorRef]
     private var names = mutable.Map.empty[ActorRef,String]
     private var pics = mutable.Map.empty[ActorRef,String]
     private var choices = mutable.Map.empty[String,Int]
     private var mostPopular = mutable.Map.empty[String,Int]
     private var quickest = mutable.Map.empty[String,Int]
-    private var rounds = 4
-    private var maxRounds = 4
+    private var rounds = 8
+    private var maxRounds = 8
     private var questions = List.empty[String] //temporary holding questioins
     players ::= host
     private var ready = 0
@@ -62,7 +64,9 @@ class GameActor(code:String,manager: ActorRef, host:ActorRef, hostName: String, 
         case GimmeQuestion() =>  playRound()
         case Response(sender,choice,time) => enterResponse(sender,choice,time)
         case StartAgain() => rounds = maxRounds
-                             playRound()
+                             reStartGame();
+        case UpvoteQ(q) => upVinDB(q)
+        case DownvoteQ(q) => downVinDB(q)
         case m => println("Unhandled message in gameActor: "+m)
     }
 
@@ -92,9 +96,28 @@ class GameActor(code:String,manager: ActorRef, host:ActorRef, hostName: String, 
     }
 
     def startGame():Unit = {
-        players.foreach(x => x ! PlayerActor.GameStarted())
         names.values.foreach(x => mostPopular(x) = 0)
         names.values.foreach(x => quickest(x) = 0)
+        var numQ = maxRounds - questions.length
+        questions.foreach(x => enterQtoDB(x))
+        // DatabaseModel.getQuestions(numQ)
+        //DatabaseModel.addGame(GameCode,MaxRounds)
+        players.foreach(x => x ! PlayerActor.GameStarted())
+    }
+    def reStartGame(): Unit = {
+        names.values.foreach(x => mostPopular(x) = 0)
+        names.values.foreach(x => quickest(x) = 0)
+        //DatabaseModel.getQuestions(maxRounds,code)
+        playRound();
+    }
+    def enterQtoDB(question: String):Unit ={
+       // DatabaseModel.addUserQuestion(question, gameCode)
+    }
+    def upVinDB(question: String):Unit = {
+
+    }
+    def downVinDB(question: String):Unit = {
+
     }
     def enterResponse(sender: ActorRef, choice: String, time: Double): Unit = {
         if(questionActive){
@@ -142,4 +165,6 @@ object GameActor{
     case class NextR()
     case class HostNextR()
     case class StartAgain()
+    case class UpvoteQ(question: String)
+    case class DownvoteQ(question: String)
 }

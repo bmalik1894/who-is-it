@@ -3,7 +3,8 @@
 const ce = React.createElement
 const csrfToken = document.getElementById("csrfToken").value;
 const song = new Audio("/versionedAssets/music/macintosh.mp3");
-
+const playing = false;
+let audioPromise = null;
 class MainComponent extends React.Component {
   constructor(props) {
     super(props);
@@ -64,15 +65,20 @@ class MainComponent extends React.Component {
         )
         }
     }
+
     createGame(e) {
         this.setState({action:"creating"});
     }
     joinGame(e) {
         this.setState({action:"joining"});
     }
+
     playAudio(e) {
-      const audioPromise = song.play();
-      if (audioPromise !== undefined) {
+      if(!playing) {
+        audioPromise = song.play();
+      } else {
+        audioPromise = song.pause();
+      } if (audioPromise !== undefined) {
         audioPromise
           .then(_ => {
               const img = document.getElementById("music-button");
@@ -85,6 +91,7 @@ class MainComponent extends React.Component {
           });
       };
     };
+
 }
 
 class CreateComponent extends React.Component {
@@ -125,14 +132,30 @@ class CreateComponent extends React.Component {
                               ce('p',
                                   {className: "card-text my-3"},
                                   "Enter the username you want to use below, then click submit to create a game."),
-                              ce('div', {className: 'col-6'},
-                                  ce('input',
-                                      {className: "form-control mb-3", placeholder: "Username", type: "text", id: "txtUsernameHost", value: this.state.userName, onChange: e => this.changeUsername(e)}),
-                                ),
-                              ce('div', {id:'pic-div'}, 
-                              ce('button', {onClick: e => this.goToPreviousPic()}, "<"),
-                              ce('img', {src: this.state.picSrc}),
-                              ce('button', {onClick: e => this.goToNextPic()}, ">"))
+                              ce('div', {className: 'col-8'},
+                                ce('input',
+                                    {className: "form-control mb-3", placeholder: "Username", type: "text", id: "txtUsernameHost", value: this.state.userName, onChange: e => this.changeUsername(e)}),
+                                ce('div', {id:'pic-div', className: 'row row-cols-3 my-3'}, 
+                                  ce('div', {className: 'col'}, 
+                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/1.png", onClick: e => this.setState({picId:1})}),
+                                  ), 
+                                  ce('div', {className: 'col'}, 
+                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/2.png", onClick: e => this.setState({picId:2})}),
+                                  ), 
+                                  ce('div', {className: 'col'}, 
+                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/3.png", onClick: e => this.setState({picId:3})}),
+                                  ),
+                                  ce('div', {className: 'col'}, 
+                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/4.png", onClick: e => this.setState({picId:4})}),
+                                  ),
+                                  ce('div', {className: 'col'}, 
+                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/5.png", onClick: e => this.setState({picId:5})}),
+                                  ),
+                                  ce('div', {className: 'col'}, 
+                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/6.png", onClick: e => this.setState({picId:6})}),
+                                  ),
+                                )
+                              ),
                           )
                       ),
                       ce('div', {className: 'card-footer'},
@@ -156,13 +179,6 @@ class CreateComponent extends React.Component {
         handleSubmit(event) {
           const username = this.state.userName;
           let myPic = this.state.picId;
-
-
-          if (myPic == 0) {
-            myPic = 6
-          } else {
-            myPic = myPic - 1
-          }
 
           console.log(username)
           if (this.state.userName.length != 0) {
@@ -209,6 +225,25 @@ class CreateComponent extends React.Component {
             console.log("picId: " + this.state.picId)
           }
         }
+        
+        playAudio(e) {
+          if(!playing) {
+            audioPromise = song.play();
+          } else {
+            audioPromise = song.pause();
+          } if (audioPromise !== undefined) {
+            audioPromise
+              .then(_ => {
+                  const img = document.getElementById("music-button");
+                  img.setAttribute("src", "/versionedAssets/images/sound_off.png");
+                // autoplay started
+              })
+              .catch(err => {
+                // catch dom exception
+                console.info(err)
+              });
+          };
+        };
 
         goBack(e) {
           this.props.goBackToMain();
@@ -258,10 +293,26 @@ class JoinComponent extends React.Component {
                                         {className: "form-control mb-3", placeholder: "Game Code", type: "text", id: "txtGameCodeJoin", value: this.state.gameCode, onChange: e => this.changeGameCode(e)}),
                                     ce('input',
                                         {className: "form-control mb-3", placeholder: "Username", type: "text", id: "txtUsernameJoin", value: this.state.userName, onChange: e => this.changeUsername(e)}),
-                                    ce('div', {id:'pic-div'}, 
-                                    ce('button', {onClick: e => this.goToPreviousPic()}, "<"),
-                                    ce('img', {src: this.state.picSrc}),
-                                    ce('button', {onClick: e => this.goToNextPic()}, ">"))
+                                        ce('div', {className: 'col-8'},
+                                        ce('div', {id:'pic-div', className: 'row row-cols-3 my-3'}, 
+                                          ce('div', {className: 'col'}, 
+                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/1.png", onClick: e => this.setState({picId:1})}),
+                                          ), 
+                                          ce('div', {className: 'col'}, 
+                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/2.png", onClick: e => this.setState({picId:2})}),
+                                          ), 
+                                          ce('div', {className: 'col'}, 
+                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/3.png", onClick: e => this.setState({picId:3})}),
+                                          ),
+                                          ce('div', {className: 'col'}, 
+                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/4.png", onClick: e => this.setState({picId:4})}),
+                                          ),
+                                          ce('div', {className: 'col'}, 
+                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/5.png", onClick: e => this.setState({picId:5})}),
+                                          ),
+                                          ce('div', {className: 'col'}, 
+                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/6.png", onClick: e => this.setState({picId:6})}),
+                                          ),
                                 )
                             )
                         ),
@@ -275,6 +326,8 @@ class JoinComponent extends React.Component {
                         )
                     )
                 )
+            )
+        )
             )
         )
     }
@@ -308,7 +361,7 @@ class JoinComponent extends React.Component {
           if (bool == 'true') {
             window.location.href = "/startGame"
           } else {
-            this.state.errorMessage = "Failed check"
+            this.state.errorMessage = "Invalid gamecode or username already taken"
           }
         });
       }
@@ -341,6 +394,25 @@ class JoinComponent extends React.Component {
         console.log("picId: " + this.state.picId)
       }
     }
+
+    playAudio(e) {
+      if(!playing) {
+        audioPromise = song.play();
+      } else {
+        audioPromise = song.pause();
+      } if (audioPromise !== undefined) {
+        audioPromise
+          .then(_ => {
+              const img = document.getElementById("music-button");
+              img.setAttribute("src", "/versionedAssets/images/sound_off.png");
+            // autoplay started
+          })
+          .catch(err => {
+            // catch dom exception
+            console.info(err)
+          });
+      };
+    };
 
     goBack(e) {
       this.props.goBackToMain();
