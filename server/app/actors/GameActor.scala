@@ -34,6 +34,7 @@ class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String,
 
     private val nonAns = "Nobody Answered :("
     //add the Host
+    println("HOSTNAME " + hostName)
     players ::= host
     names(host) = hostName
     pics(host) = hostPic
@@ -43,11 +44,12 @@ class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String,
     import GameActor._
     def receive = {
         case AddPal(pal,name,nPic) => players ::= pal
-                                 names(pal) = name
-                                 pics(pal) = nPic
-                                 pal ! PlayerActor.GameAdded(self)
-                                 pal ! PlayerActor.CurrentUsers(players.map(x => (names(x),pics(x))))
-                                 players.foreach(x => x ! PlayerActor.NewU(name,nPic))
+                                        println(name)
+                                      names(pal) = name
+                                      pics(pal) = nPic
+                                      pal ! PlayerActor.GameAdded(self)
+                                      pal ! PlayerActor.CurrentUsers(players.map(x => (names(x),pics(x))))
+                                      players.foreach(x => x ! PlayerActor.NewU(name,nPic))
         case ChangeRounds(n) => maxRounds = n
                                 rounds = n
         case ChoosePic(pal,pic) => if(pics.contains(pal)){

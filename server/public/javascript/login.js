@@ -177,8 +177,13 @@ class CreateComponent extends React.Component {
         }
 
         handleSubmit(event) {
-          const username = this.state.userName;
+          let username = this.state.userName;
           let myPic = this.state.picId;
+
+
+          while (username.includes(",")) {
+            username = username.replace(",", "")
+          }
 
           console.log(username)
           if (this.state.userName.length != 0) {
@@ -341,11 +346,15 @@ class JoinComponent extends React.Component {
     }
 
     handleSubmit(event) {
-      const username = this.state.userName;
+      let username = this.state.userName;
       const gameCode = this.state.gameCode;
       let myPic = this.state.picId;
 
-      if (this.state.userName.length != 0 && this.state.gameCode != 0) {
+      while (username.includes(",")) {
+        username = username.replace(",", "")
+      }
+
+      if (username.length != 0 && gameCode != 0) {
         fetch(validateJoinRoute.value, {
           method: 'POST',
           headers: {'Content-Type': 'application/json', 'Csrf-Token': csrfToken },

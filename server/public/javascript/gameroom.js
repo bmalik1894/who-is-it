@@ -257,7 +257,7 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
                                     {className: "card-text my-3"},
                                     "Submit a question to be used in the game."),
                                 // Host didn't have onClick previously; idk if they need this?
-                                ce('div', {id:"questiondiv", onClick: e => this.refreshQuestions()})
+                                ce('div', {id:"questiondiv"})
                             )
                         ),
                         ce('div', {className: 'card-footer'},
@@ -318,9 +318,14 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
 
     sendQuestion() {
         if (!usonBoard.includes(this.state.newQuestion)) {
-        const quest = this.state.newQuestion;
+        let quest = this.state.newQuestion;
+        
+        if (quest.includes(",")) {
+            quest = quest.split(",").join('');
+        }
+        
         socket.send("ADDQ," + quest);
-        this.setState({newQuestion:""})
+        this.setState({newQuestion:""});
         }
     }
 
@@ -387,7 +392,7 @@ class PlayerWaitingRoom extends React.Component { //////////////////////////////
                                 ),
                                 ce('div', {className: 'row justify-content-md-center'},
                                     ce('div', {className: 'col-sm-8'},
-                                        ce('div', {className: 'row row-cols-3', id:'users-div', onClick: e => this.refreshUsers()})
+                                        ce('div', {className: 'row row-cols-3', id:'users-div'})
                                     )
                                 )
                             )
@@ -417,7 +422,7 @@ class PlayerWaitingRoom extends React.Component { //////////////////////////////
                                 ce('p',
                                     {className: "card-text my-3"},
                                     "Submit a question to be used in the game."),
-                                ce('div', {id:"questiondiv", onClick: e => this.refreshQuestions()})
+                                ce('div', {id:"questiondiv"})
                             )
                         ),
                         ce('div', {className: 'card-footer'},
@@ -445,11 +450,6 @@ class PlayerWaitingRoom extends React.Component { //////////////////////////////
         }
     }
 
-    refreshQuestions() {
-        populateQuestions();
-        this.setState({questions:questionList});
-    }
-
     startGame() {
         if (!this.state.ready) {
         socket.send("READY");
@@ -458,11 +458,6 @@ class PlayerWaitingRoom extends React.Component { //////////////////////////////
         this.setState({ready:true});    
         }
         
-    }
-
-    refreshUsers() {
-        populateUsers();
-        this.setState({users:userList});
     }
 
 }
