@@ -27,7 +27,11 @@ let quickdraw = "";
 let firstRound = true;
 let numRounds = 12;
 let currRound = 0;
+let amtOfTime = 60;
+let currTime = amtOfTime;
 let picId = currUser.split(",")[1]
+let alreadyanswered = false;
+let timerid = null
 currUser = currUser.split(",")[0]
 
 // Opens socket through either host or player route
@@ -53,7 +57,8 @@ function handleMessage(data) {
     } else if (data.includes("NEWU,")) { // Recieve new User
         userList.push(data.replace("NEWU,",""))
         populateUsers();
-    } else if (data == "STARTGAME") {
+    } else if (data.includes("STARTGAME,")) {
+        amtOfTime = data.replace("STARTGAME,","");
         ReactDOM.render(
             ce(MainComponent, null, null), 
             document.getElementById('mainroomdiv')
@@ -139,12 +144,13 @@ function addGenericQuestions(number) {
 function getPicIdFromUsername(username) {
     for (let i = 0; i < userList.length; i++) {
         if (userList[i].split(",")[0] == username) {
-            console.log("found pic from user " + userList[i]);
             return userList[i].split(",")[1];
         }
     }
     return 0;
 }
+
+// timer function
 
 
 //React:
@@ -194,7 +200,7 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
                                         ce('label', {className: 'form-label', htmlFor: 'roundTime'}, "Round time: "),
                                     ),
                                     ce('div', {className: 'col'},
-                                        ce('input', {className: 'form-control', id: 'roundTime', type:'number', min:5, max:120, defaultValue:60, onChange: e => this.setState({timerLength:e.target.value})}),
+                                        ce('input', {className: 'form-control', id: 'roundTime', type:'number', min:5, max:120, defaultValue:60, onChange: e => this.sendTimerAmount(e)}),
                                     )
                                 ),
                                 ce('div', {className: 'row'},
@@ -217,7 +223,7 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
                                 ),
                                 ce('div', {className: 'row justify-content-md-center'},
                                     ce('div', {className: 'col-sm-8'},
-                                        ce('div', {className: 'row row-cols-3', id:'users-div', onClick: e => this.refreshUsers()})
+                                        ce('div', {className: 'row row-cols-3', id:'users-div'})
                                     )
                                 )
                             )
@@ -311,10 +317,11 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
     }
 
     sendQuestion() {
+        if (!usonBoard.includes(this.state.newQuestion)) {
         const quest = this.state.newQuestion;
-        console.log(quest)
         socket.send("ADDQ," + quest);
         this.setState({newQuestion:""})
+        }
     }
 
     startGame() {
@@ -431,10 +438,11 @@ class PlayerWaitingRoom extends React.Component { //////////////////////////////
     }
 
     sendQuestion() {
+        if (!usonBoard.includes(this.state.newQuestion)) {
         const quest = this.state.newQuestion;
-        console.log(quest)
         socket.send("ADDQ," + quest);
         this.setState({newQuestion:""})
+        }
     }
 
     refreshQuestions() {
@@ -499,15 +507,33 @@ class DisplayGameComponent extends React.Component {
         }
         this.addAnswers();
         this.setState({round: currRound})
+        alreadyanswered = false;
+        currTime = amtOfTime;
+        timerid = setInterval(() => this.countdown(), 1000)
     }
 
     render() {
         return ce('div', {},
             ce("h3", null, "Round: " + this.state.round),
             ce('br'),
+            ce('p', {id:"timer"}, "Time remaining: "),
             ce('h3',{id:"currQuestion"}, this.state.currQuestion),
             ce('div', {id:'playerdiv'}, ""),
             );
+    }
+
+    countdown() {
+        if (currTime > 0 && !alreadyanswered) {
+            document.getElementById("timer").innerHTML = "Time remaining: " + currTime;
+            currTime -= 1;
+        } else if (!alreadyanswered) {
+            document.getElementById("timer").innerHTML = "Time remaining: " + currTime;
+            socket.send("NOANSWER")
+            alreadyanswered = true;
+            clearInterval(timerid);
+        } else {
+            clearInterval(timerid);
+        }
     }
 
     grabQuestion() {
@@ -531,8 +557,8 @@ class DisplayGameComponent extends React.Component {
                         anyclicked = true;
                     }
                 }
-                
                 if (!anyclicked) {
+                    alreadyanswered = true;
                     socket.send("ANSWER," + player.split(",")[0]);
                     this.style.fontWeight = "bold";
                     this.active = true;    
@@ -626,12 +652,26 @@ class GameOverComponent extends React.Component { ///////////////////////////// 
     }
 
     render() {
-        return ce('div', {id:'gameoverdiv'},
-        ce('h3', {}, "GAME OVER"),
-        ce('p', {}, "Most Popular Player: " + this.state.mostpopular),
-        ce('p', {}, "Least Popular Player: " + this.state.leastpopular),
-        ce('p', {}, "Quickest Player: " + this.state.fastest)
-        )
+        if (isHost) {
+            return ce('div', {id:'gameoverdiv'},
+            ce('h3', {}, "GAME OVER"),
+            ce('p', {}, "Most Popular Player: " + this.state.mostpopular),
+            ce('p', {}, "Least Popular Player: " + this.state.leastpopular),
+            ce('p', {}, "Quickest Player: " + this.state.fastest),
+            ce('button', {onClick: e => this.resetGame()})
+            )
+        } else {
+            return ce('div', {id:'gameoverdiv'},
+            ce('h3', {}, "GAME OVER"),
+            ce('p', {}, "Most Popular Player: " + this.state.mostpopular),
+            ce('p', {}, "Least Popular Player: " + this.state.leastpopular),
+            ce('p', {}, "Quickest Player: " + this.state.fastest)
+            )    
+        }
+    }
+
+    resetGame() {
+        socket.send("RESTART")
     }
 }
 

@@ -345,12 +345,6 @@ class JoinComponent extends React.Component {
       const gameCode = this.state.gameCode;
       let myPic = this.state.picId;
 
-      if (myPic == 0) {
-        myPic = 6
-      } else {
-        myPic = myPic - 1
-      }
-
       if (this.state.userName.length != 0 && this.state.gameCode != 0) {
         fetch(validateJoinRoute.value, {
           method: 'POST',

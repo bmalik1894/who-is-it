@@ -46,10 +46,13 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
                 val recie = strings(2)
                 val mess = strings(3)
                 myGame ! GameActor.ChatMessage(sender,recie,mess)
-            } else if (s.contains("ANSWER")){
+            } else if(s == "NOANSWER"){ 
+                println("got No Response!")
+                myGame ! GameActor.NoResponse(self)
+            }else if (s.contains("ANSWER")){
                 val ans = s.split(",")(1)
                 myGame ! GameActor.Response(self,ans,0.0)
-            } else if (s == "STARTROUND"){
+            }else if (s == "STARTROUND"){
                 myGame ! GameActor.GimmeQuestion()
             } else if (s == "NEXTROUND"){
                 myGame ! GameActor.NextR()
@@ -57,6 +60,9 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
                 myGame ! GameActor.HostNextR()
             }else if (s == "RESTART"){
                 myGame ! GameActor.StartAgain()
+            }else if (s.contains("TIMER")){
+                val time = s.split(",")(1)
+                myGame ! GameActor.ChangeTime(time.toDouble)
             }
         case GameCreated(game,code) => myGame = game
                                         out ! "NEWGAMECODE," + code
@@ -68,7 +74,7 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
                                            //var dummy = ""
                                            //answers.foreach(x => dummy += "/"+x._1 +"+" + x._2)
                                            out ! "ROUND,"+q 
-        case GameStarted() => out ! "STARTGAME"
+        case GameStarted(time) => out ! "STARTGAME," + time
         case CurrentUsers(people) => {
                 people.foreach(x => out ! "NEWU,"+x._1+","+x._2)
             }
@@ -84,9 +90,10 @@ object PlayerActor{
    case class GameAdded(game:ActorRef)
    case class JoinFailed()
    case class RoundQuestion(quest:String)
-   case class GameStarted()
+   case class GameStarted(time: Double)
    case class CurrentUsers(people: List[(String,String)])
    case class NewU(user:String,pic:String)
    case class Winner(win:String)
-   case class EndGame(pop:String,lPop:String,quick:String)
+   case class EndGame(pop: String,lPop: String,quick: String)
+
 }
