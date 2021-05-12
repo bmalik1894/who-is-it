@@ -15,7 +15,7 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
     import PlayerActor._
     def receive = {
         case s:String => 
-            if(s.contains("NEWGAME")){ //NEWGAME,username
+            if(s.contains("NEWGAME,")){ //NEWGAME,username
                 val strings = s.split(",")
                 val userName = strings(1)
                 val pic = strings(2)
