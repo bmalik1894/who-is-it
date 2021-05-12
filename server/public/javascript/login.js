@@ -136,26 +136,26 @@ class CreateComponent extends React.Component {
                               ce('div', {className: 'col-8'},
                                 ce('input',
                                     {className: "form-control mb-3", placeholder: "Username", type: "text", id: "txtUsernameHost", value: this.state.userName, onChange: e => this.changeUsername(e)}),
-                                ce('div', {id:'pic-div', className: 'row row-cols-3 my-3'}, 
-                                  ce('div', {className: 'col'}, 
-                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/1.png", onClick: e => this.setState({picId:1})}),
-                                  ), 
-                                  ce('div', {className: 'col'}, 
-                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/2.png", onClick: e => this.setState({picId:2})}),
-                                  ), 
-                                  ce('div', {className: 'col'}, 
-                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/3.png", onClick: e => this.setState({picId:3})}),
-                                  ),
-                                  ce('div', {className: 'col'}, 
-                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/4.png", onClick: e => this.setState({picId:4})}),
-                                  ),
-                                  ce('div', {className: 'col'}, 
-                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/5.png", onClick: e => this.setState({picId:5})}),
-                                  ),
-                                  ce('div', {className: 'col'}, 
-                                    ce('img', {className: 'img-fluid', src: "versionedAssets/images/6.png", onClick: e => this.setState({picId:6})}),
-                                  ),
-                                )
+                                  ce('div', {id:'pic-div', className: 'row row-cols-3 my-3'},
+                                      ce('div', {className: 'col'},
+                                          ce('img', {className: 'img-fluid', src: "versionedAssets/images/1.png", onClick: e => this.changeAvatar(1)}),
+                                      ),
+                                      ce('div', {className: 'col'},
+                                          ce('img', {className: 'img-fluid', src: "versionedAssets/images/2.png", onClick: e => this.changeAvatar(2)}),
+                                      ),
+                                      ce('div', {className: 'col'},
+                                          ce('img', {className: 'img-fluid', src: "versionedAssets/images/3.png", onClick: e => this.changeAvatar(3)}),
+                                      ),
+                                      ce('div', {className: 'col'},
+                                          ce('img', {className: 'img-fluid', src: "versionedAssets/images/4.png", onClick: e => this.changeAvatar(4)}),
+                                      ),
+                                      ce('div', {className: 'col'},
+                                          ce('img', {className: 'img-fluid', src: "versionedAssets/images/5.png", onClick: e => this.changeAvatar(5)}),
+                                      ),
+                                      ce('div', {className: 'col'},
+                                          ce('img', {className: 'img-fluid', src: "versionedAssets/images/6.png", onClick: e => this.changeAvatar(6)}),
+                                      )
+                                  )
                               ),
                           )
                       ),
@@ -173,92 +173,104 @@ class CreateComponent extends React.Component {
       )
   }
 
-        changeUsername(e) {
-            this.setState({userName: e.target.value});
-        }
-
-        handleSubmit(event) {
-          let username = this.state.userName;
-          let myPic = this.state.picId;
-
-
-          while (username.includes(",")) {
-            username = username.replace(",", "")
-          }
-
-          console.log(username)
-          if (this.state.userName.length != 0) {
-            fetch(validateHostRoute.value, { 
-              method: 'POST', 
-              headers: {'Content-Type': 'application/json', 'Csrf-Token': csrfToken }, 
-              body: JSON.stringify({user:username + "," + myPic})
-              }
-            ).then(res => res.text()).then(bool => {
-              if (bool == 'true') {
-                window.location.href = "/startGame"
-              } else {
-                this.state.errorMessage = "Failed check"  
-              }
-            });
-            
-          }
-        }
-
-        goToPreviousPic() {
-          const tempid = this.state.picId;
-          if (tempid > 0) {
-            this.setState({picId:tempid - 1})
-            this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
-            console.log("picId: " + this.state.picId)
-          }
-           else {
-            this.setState({picId:6})
-            this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
-            console.log("picId: " + this.state.picId)
+    changeAvatar(num) {
+        this.setState({picId:num});
+        const images = document.getElementById("pic-div").childNodes;
+        for (let i = 0; i < images.length; i++) {
+            if (num - 1 === i) {
+                images.item(i).firstChild.parentElement.firstElementChild.className = "img-fluid active";
+            } else {
+                images.item(i).firstChild.parentElement.firstElementChild.className = "img-fluid";
             }
         }
-    
-        goToNextPic() {
-          const tempid = this.state.picId;
-          if (tempid < 6) {
-            this.setState({picId:tempid + 1})
-            this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
-            console.log("picId: " + this.state.picId)
-          }
-           else {
-            this.setState({picId:0})
-            this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
-            console.log("picId: " + this.state.picId)
-          }
-        }
-        
-        playAudio(e) {
+    }
 
-          if(!playing) {
-            audioPromise = song.play();
-            playing= true;
-            soundsrc = "/versionedAssets/images/sound_off.png";
+    changeUsername(e) {
+        this.setState({userName: e.target.value});
+    }
+
+    handleSubmit(event) {
+      let username = this.state.userName;
+      let myPic = this.state.picId;
+
+
+      while (username.includes(",")) {
+        username = username.replace(",", "")
+      }
+
+      console.log(username)
+      if (this.state.userName.length != 0) {
+        fetch(validateHostRoute.value, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json', 'Csrf-Token': csrfToken },
+          body: JSON.stringify({user:username + "," + myPic})
+          }
+        ).then(res => res.text()).then(bool => {
+          if (bool == 'true') {
+            window.location.href = "/startGame"
           } else {
-            audioPromise = song.pause();
-            playing = false;
-            soundsrc = "/versionedAssets/images/sound_on.png";
-          } if (audioPromise !== undefined) {
-            audioPromise
-              .then(_ => {
-                  const img = document.getElementById("music-button");
-                  img.setAttribute("src", soundsrc);
-                // autoplay started
-              })
-              .catch(err => {
-                // catch dom exception
-                console.info(err)
-              });
-          };
-        };
+            this.state.errorMessage = "Failed check"
+          }
+        });
 
-        goBack(e) {
-          this.props.goBackToMain();
+      }
+    }
+
+    goToPreviousPic() {
+      const tempid = this.state.picId;
+      if (tempid > 0) {
+        this.setState({picId:tempid - 1})
+        this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
+        console.log("picId: " + this.state.picId)
+      }
+       else {
+        this.setState({picId:6})
+        this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
+        console.log("picId: " + this.state.picId)
         }
+    }
+
+    goToNextPic() {
+      const tempid = this.state.picId;
+      if (tempid < 6) {
+        this.setState({picId:tempid + 1})
+        this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
+        console.log("picId: " + this.state.picId)
+      }
+       else {
+        this.setState({picId:0})
+        this.setState({picSrc:"versionedAssets/images/" + this.state.picId + ".png"})
+        console.log("picId: " + this.state.picId)
+      }
+    }
+
+    playAudio(e) {
+
+      if(!playing) {
+        audioPromise = song.play();
+        playing= true;
+        soundsrc = "/versionedAssets/images/sound_off.png";
+      } else {
+        audioPromise = song.pause();
+        playing = false;
+        soundsrc = "/versionedAssets/images/sound_on.png";
+      } if (audioPromise !== undefined) {
+        audioPromise
+          .then(_ => {
+              const img = document.getElementById("music-button");
+              img.setAttribute("src", soundsrc);
+            // autoplay started
+          })
+          .catch(err => {
+            // catch dom exception
+            console.info(err)
+          });
+      };
+    };
+
+    goBack(e) {
+      this.props.goBackToMain();
+    }
 }
 
 class JoinComponent extends React.Component {
@@ -306,23 +318,23 @@ class JoinComponent extends React.Component {
                                         {className: "form-control mb-3", placeholder: "Username", type: "text", id: "txtUsernameJoin", value: this.state.userName, onChange: e => this.changeUsername(e)}),
                                     ce('div', {id:'pic-div', className: 'row row-cols-3 my-3'}, 
                                       ce('div', {className: 'col'}, 
-                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/1.png", onClick: e => this.setState({picId:1})}),
+                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/1.png", onClick: e => this.changeAvatar(1)}),
                                       ), 
                                       ce('div', {className: 'col'}, 
-                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/2.png", onClick: e => this.setState({picId:2})}),
+                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/2.png", onClick: e => this.changeAvatar(2)}),
                                       ), 
                                       ce('div', {className: 'col'}, 
-                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/3.png", onClick: e => this.setState({picId:3})}),
+                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/3.png", onClick: e => this.changeAvatar(3)}),
                                       ),
                                       ce('div', {className: 'col'}, 
-                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/4.png", onClick: e => this.setState({picId:4})}),
+                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/4.png", onClick: e => this.changeAvatar(4)}),
                                       ),
                                       ce('div', {className: 'col'}, 
-                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/5.png", onClick: e => this.setState({picId:5})}),
+                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/5.png", onClick: e => this.changeAvatar(5)}),
                                       ),
                                       ce('div', {className: 'col'}, 
-                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/6.png", onClick: e => this.setState({picId:6})}),
-                                      ),
+                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/6.png", onClick: e => this.changeAvatar(6)}),
+                                      )
                                     )
                                 )
                             )
@@ -339,6 +351,18 @@ class JoinComponent extends React.Component {
                 )
             )
         )
+    }
+
+    changeAvatar(num) {
+        this.setState({picId:num});
+        const images = document.getElementById("pic-div").childNodes;
+        for (let i = 0; i < images.length; i++) {
+            if (num - 1 === i) {
+                images.item(i).firstChild.parentElement.firstElementChild.className = "img-fluid active";
+            } else {
+                images.item(i).firstChild.parentElement.firstElementChild.className = "img-fluid";
+            }
+        }
     }
         
     changeGameCode(e) {
