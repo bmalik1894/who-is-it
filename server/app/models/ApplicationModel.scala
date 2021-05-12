@@ -23,4 +23,9 @@ object ApplicationModel {
         true
     }
 
+    def enterGame(code:String, username:String): Boolean = {
+        games += (code -> Seq(username))
+        true
+    }
+
 }

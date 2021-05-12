@@ -40,44 +40,20 @@ class Application @Inject()(cc: ControllerComponents) extends AbstractController
   def validateUserHost = Action { implicit request =>
       request.body.asJson.map { data => 
         val username = data("user").toString()
-          if (ApplicationModel.verifyUser("", username)) {
           Ok("true")
             .withSession("username" -> username, "code" -> "host", "csrfToken" -> play.filters.csrf.CSRF.getToken.get.value)
-          } else {
-          Ok("false")
-          }
         }.getOrElse(Redirect(routes.Application.login()).flashing("error" -> "Could not verify username."))
   }
 
   def startGame = Action { implicit request =>
     val username = request.session.get("username").getOrElse("")
     val code = request.session.get("code").getOrElse("player")
-    Ok(views.html.gameroom(username, code))
+    val token = request.session.get("csrfToken").getOrElse("")
+    Ok(views.html.gameroom(username, code, token))
   }
 
   def validatecsrf = Action { implicit request =>
     Ok(views.html.login()).withSession("csrfToken" -> play.filters.csrf.CSRF.getToken.get.value)
   }
-
-
-
-  //Database functions
-  def addGameDB(code: String, rounds: Int): Unit = {
-
-  }
-
-  def addUserQDB(question: String, code: String):Unit = {
-    ???
-  }
-
-  def getQuestion(code: String, numQ: Int): List[String] = {
-    ???
-  }
-
-  def upVDB(question: String, code: String):Unit = {
-    ???
-  }
-  def downVDB(question: String, code: String):Unit ={
-    ???
-  }
+  
 }

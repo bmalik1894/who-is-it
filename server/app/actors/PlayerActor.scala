@@ -40,12 +40,6 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
               //  println("NewQ got:"+s)
                 val quest = s.split(",")(1)
                 myGame ! GameActor.NewQ(quest)
-            } else if (s.contains("CHAT,")){ //CHAT,sender,recipient,message
-                val strings = s.split(",")
-                val sender = strings(1)
-                val recie = strings(2)
-                val mess = strings(3)
-                myGame ! GameActor.ChatMessage(sender,recie,mess)
             } else if(s == "NOANSWER"){ 
                 println("got No Response!")
                 myGame ! GameActor.NoResponse(self)
@@ -69,7 +63,7 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
         case GameAdded(game) => myGame = game
                                 out ! "CONNECTED"
         case GameActor.QuestionAdded(q) => out ! "NEWQ,"+q 
-        case JoinFailed => out ! "BADCODE"
+        case JoinFailed() => out ! "BADCODE"
         case RoundQuestion(q) =>  timer = 0.0 // NEWQ,question/name+pic/name+pic
                                            //var dummy = ""
                                            //answers.foreach(x => dummy += "/"+x._1 +"+" + x._2)
