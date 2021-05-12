@@ -20,36 +20,30 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
                 val userName = strings(1)
                 val pic = strings(2)
                 manager ! GamesManager.NewGame(self,userName,pic)
-            } else if (s.contains("JOIN")){ //JOIN,code,username
+            } else if (s.contains("JOIN,")){ //JOIN,code,username
                 val strings = s.split(",")
                 val code = strings(1)
                 val userName = strings(2)
                 val pic = strings(3)
                 manager ! GamesManager.JoinGame(self,userName,code,pic)
-            } else if (s.contains("PIC")){ //PIC,picID
+            } else if (s.contains("PIC,")){ //PIC,picID
                 val picID = s.split(",")(1)
                 myGame ! GameActor.ChoosePic(self,picID)
-            } else if (s.contains("ROUNDS")){ //ROUNDS,roundsnum
+            } else if (s.contains("ROUNDS,")){ //ROUNDS,roundsnum
                 val newRounds = s.split(",")(1)
                 myGame ! GameActor.ChangeRounds(newRounds.toInt)
             } else if (s == "READY"){ //READY
                 myGame ! GameActor.Ready()
             } else if (s == "HOSTREADY"){ //HOSTREADY      (this overides wveryone else and starts the game)
                 myGame ! GameActor.HostReady()
-            } else if (s.contains("ADDQ")){ //ADDQ,question
+            } else if (s.contains("ADDQ,")){ //ADDQ,question
               //  println("NewQ got:"+s)
                 val quest = s.split(",")(1)
                 myGame ! GameActor.NewQ(quest)
-            } else if (s.contains("CHAT")){ //CHAT,sender,recipient,message
-                val strings = s.split(",")
-                val sender = strings(1)
-                val recie = strings(2)
-                val mess = strings(3)
-                myGame ! GameActor.ChatMessage(sender,recie,mess)
             } else if(s == "NOANSWER"){ 
                 println("got No Response!")
                 myGame ! GameActor.NoResponse(self)
-            }else if (s.contains("ANSWER")){
+            }else if (s.contains("ANSWER,")){
                 val ans = s.split(",")(1)
                 myGame ! GameActor.Response(self,ans,0.0)
             }else if (s == "STARTROUND"){
@@ -60,7 +54,7 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
                 myGame ! GameActor.HostNextR()
             }else if (s == "RESTART"){
                 myGame ! GameActor.StartAgain()
-            }else if (s.contains("TIMER")){
+            }else if (s.contains("TIMER,")){
                 val time = s.split(",")(1)
                 myGame ! GameActor.ChangeTime(time.toDouble)
             }
@@ -69,7 +63,7 @@ class PlayerActor(out: ActorRef, manager: ActorRef) extends Actor{
         case GameAdded(game) => myGame = game
                                 out ! "CONNECTED"
         case GameActor.QuestionAdded(q) => out ! "NEWQ,"+q 
-        case JoinFailed => out ! "BADCODE"
+        case JoinFailed() => out ! "BADCODE"
         case RoundQuestion(q) =>  timer = 0.0 // NEWQ,question/name+pic/name+pic
                                            //var dummy = ""
                                            //answers.foreach(x => dummy += "/"+x._1 +"+" + x._2)

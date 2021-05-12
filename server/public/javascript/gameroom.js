@@ -11,7 +11,7 @@ currUser = currUser.substring(1, currUser.length - 1)
 let gameCode = document.getElementById("stateInput").value;
 let isHost = false;
 const song = new Audio("/versionedAssets/music/macintosh.mp3");
-
+const csrfToken = document.getElementById("csrfToken").value
 
 // React create element and local datalists outside react
 const ce = React.createElement;
@@ -95,6 +95,8 @@ function handleMessage(data) {
             ce(GameOverComponent, null, null),
             document.getElementById("mainroomdiv")
         )
+    } else if (data == "BADCODE") {
+        window.location.href = "/"
     }
 }
 

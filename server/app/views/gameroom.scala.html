@@ -1,7 +1,7 @@
-@(user:String, state:String)(implicit request: RequestHeader)
+@(user:String, state:String, token:String)(implicit request: RequestHeader)
 
 @main("Who is it?"){
-        <input type="hidden" id="csrfToken" value="@helper.CSRF.getToken.value">
+        <input type="hidden" id="csrfToken" value="@token">
         <input type="hidden" id="usernameInput" value="@user">
         <input type="hidden" id="ws-route" value="@routes.WebSocketApp.socket().absoluteURL()">
         <input type="hidden" id="stateInput" value="@state">

@@ -10,6 +10,7 @@ POST       /HostGame                     controllers.Application.validateUserHos
 GET        /startGame                    controllers.Application.startGame
 POST       /addCSRF                      controllers.Application.validatecsrf
 
+
 # Websocket Routes
 GET        /socket                       controllers.WebSocketApp.socket
 

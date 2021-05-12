@@ -3,7 +3,8 @@
 const ce = React.createElement
 const csrfToken = document.getElementById("csrfToken").value;
 const song = new Audio("/versionedAssets/music/macintosh.mp3");
-const playing = false;
+let playing = false;
+let soundsrc = "";
 let audioPromise = null;
 class MainComponent extends React.Component {
   constructor(props) {
@@ -232,15 +233,20 @@ class CreateComponent extends React.Component {
         }
         
         playAudio(e) {
+
           if(!playing) {
             audioPromise = song.play();
+            playing= true;
+            soundsrc = "/versionedAssets/images/sound_off.png";
           } else {
             audioPromise = song.pause();
+            playing = false;
+            soundsrc = "/versionedAssets/images/sound_on.png";
           } if (audioPromise !== undefined) {
             audioPromise
               .then(_ => {
                   const img = document.getElementById("music-button");
-                  img.setAttribute("src", "/versionedAssets/images/sound_off.png");
+                  img.setAttribute("src", soundsrc);
                 // autoplay started
               })
               .catch(err => {
@@ -293,31 +299,31 @@ class JoinComponent extends React.Component {
                                 ce('p',
                                     {className: "card-text my-3"},
                                     "Enter your host's game code and the name you would like to use, then click join."),
-                                ce('div', {className: 'col-6'},
+                                ce('div', {className: 'col-8'},
                                     ce('input',
                                         {className: "form-control mb-3", placeholder: "Game Code", type: "text", id: "txtGameCodeJoin", value: this.state.gameCode, onChange: e => this.changeGameCode(e)}),
                                     ce('input',
                                         {className: "form-control mb-3", placeholder: "Username", type: "text", id: "txtUsernameJoin", value: this.state.userName, onChange: e => this.changeUsername(e)}),
-                                        ce('div', {className: 'col-8'},
-                                        ce('div', {id:'pic-div', className: 'row row-cols-3 my-3'}, 
-                                          ce('div', {className: 'col'}, 
-                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/1.png", onClick: e => this.setState({picId:1})}),
-                                          ), 
-                                          ce('div', {className: 'col'}, 
-                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/2.png", onClick: e => this.setState({picId:2})}),
-                                          ), 
-                                          ce('div', {className: 'col'}, 
-                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/3.png", onClick: e => this.setState({picId:3})}),
-                                          ),
-                                          ce('div', {className: 'col'}, 
-                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/4.png", onClick: e => this.setState({picId:4})}),
-                                          ),
-                                          ce('div', {className: 'col'}, 
-                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/5.png", onClick: e => this.setState({picId:5})}),
-                                          ),
-                                          ce('div', {className: 'col'}, 
-                                            ce('img', {className: 'img-fluid', src: "versionedAssets/images/6.png", onClick: e => this.setState({picId:6})}),
-                                          ),
+                                    ce('div', {id:'pic-div', className: 'row row-cols-3 my-3'}, 
+                                      ce('div', {className: 'col'}, 
+                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/1.png", onClick: e => this.setState({picId:1})}),
+                                      ), 
+                                      ce('div', {className: 'col'}, 
+                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/2.png", onClick: e => this.setState({picId:2})}),
+                                      ), 
+                                      ce('div', {className: 'col'}, 
+                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/3.png", onClick: e => this.setState({picId:3})}),
+                                      ),
+                                      ce('div', {className: 'col'}, 
+                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/4.png", onClick: e => this.setState({picId:4})}),
+                                      ),
+                                      ce('div', {className: 'col'}, 
+                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/5.png", onClick: e => this.setState({picId:5})}),
+                                      ),
+                                      ce('div', {className: 'col'}, 
+                                        ce('img', {className: 'img-fluid', src: "versionedAssets/images/6.png", onClick: e => this.setState({picId:6})}),
+                                      ),
+                                    )
                                 )
                             )
                         ),
@@ -331,8 +337,6 @@ class JoinComponent extends React.Component {
                         )
                     )
                 )
-            )
-        )
             )
         )
     }
@@ -399,15 +403,20 @@ class JoinComponent extends React.Component {
     }
 
     playAudio(e) {
+      
       if(!playing) {
         audioPromise = song.play();
+        playing= true;
+        soundsrc = "/versionedAssets/images/sound_off.png";
       } else {
         audioPromise = song.pause();
+        playing = false;
+        soundsrc = "/versionedAssets/images/sound_on.png";
       } if (audioPromise !== undefined) {
         audioPromise
           .then(_ => {
               const img = document.getElementById("music-button");
-              img.setAttribute("src", "/versionedAssets/images/sound_off.png");
+              img.setAttribute("src", soundsrc);
             // autoplay started
           })
           .catch(err => {
