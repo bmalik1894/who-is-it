@@ -140,7 +140,6 @@ class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String,
     //receives a response from a player and increases the count for their choice
     //It checks if it has seen a response from each player and ends the round if it has
     def enterResponse(sender: ActorRef, choice: String, time: Double): Unit = {
-        println("entereing Response")
         if(questionActive){
             if(choice != nonAns){
                 if(submited == 0){
@@ -170,7 +169,9 @@ class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String,
         questionActive = false
         if(rounds <= 0){
             val pop = mostPopular.maxBy(_._2)._1
-            val leastPop = mostPopular.filter(x => x._1 != nonAns).minBy(_._2)._1
+            var leastPop = pop
+            if (mostPopular.count(x => x == x) != 2) { leastPop = mostPopular.filter(x => x._1 != nonAns && x._1 != pop).minBy(_._2)._1 } 
+            else {println("only one player")}
             val quick = quickest.maxBy(_._2)._1
             players.foreach(x => x ! PlayerActor.EndGame(pop,leastPop,quick))
         }
