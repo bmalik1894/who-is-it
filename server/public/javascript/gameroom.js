@@ -268,7 +268,7 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
                         //         ce('button', {className: 'btn btn-secondary',onClick: e => this.addDBQ()}, "Add")
                         //     ),
                             ce('input',
-                                {className: "form-control mb-3", type: "text", placeholder: "Question", onChange: e => this.changeNewQuestion(e)}),
+                                {className: "form-control mb-3", type: "text", placeholder: "Question", onChange: e => this.changeNewQuestion(e), value: this.state.newQuestion}),
                             ce('button',
                                 {className: "btn btn-primary me-3", onClick: e => this.sendQuestion(e)},
                                 "Submit"),
@@ -319,7 +319,7 @@ class HostWaitingRoom extends React.Component { ///////////////////////// HOST W
     }
 
     sendQuestion() {
-        if (!usonBoard.includes(this.state.newQuestion)) {
+        if (!qsonBoard.includes(this.state.newQuestion)) {
         let quest = this.state.newQuestion;
         
         if (quest.includes(",")) {
@@ -429,7 +429,7 @@ class PlayerWaitingRoom extends React.Component { //////////////////////////////
                         ),
                         ce('div', {className: 'card-footer'},
                             ce('input',
-                                {className: "form-control mb-3", type: "text", placeholder: "Question", onChange: e => this.changeNewQuestion(e)}),
+                                {className: "form-control mb-3", type: "text", placeholder: "Question", onChange: e => this.changeNewQuestion(e), value:this.state.newQuestion}),
                             ce('button',
                                 {className: "btn btn-primary me-3", onClick: e => this.sendQuestion(e)},
                                 "Submit"),
