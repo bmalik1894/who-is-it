@@ -170,7 +170,7 @@ class GameActor(code: String,manager: ActorRef, host:ActorRef, hostName: String,
         questionActive = false
         if(rounds <= 0){
             val pop = mostPopular.maxBy(_._2)._1
-            val leastPop = mostPopular.minBy(_._2)._1
+            val leastPop = mostPopular.filter(x => x._1 != nonAns).minBy(_._2)._1
             val quick = quickest.maxBy(_._2)._1
             players.foreach(x => x ! PlayerActor.EndGame(pop,leastPop,quick))
         }
