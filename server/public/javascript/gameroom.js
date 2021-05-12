@@ -511,38 +511,51 @@ class DisplayGameComponent extends React.Component {
 
     render() {
         return ce('div', {className: "container-sm mt-2 font-monospace"},
-        ce('div', {className: "row justify-content-md-center row-eq-height"},
-            ce('div', {className: "col-lg-6"},
-                ce('div', {className: "card mb-3"},
-                    ce('div', {className: 'card-header'},
-                        ce('div', {className: 'card-title'},
-                            ce('div', {className: 'row align-middle justify-content-between'},
-                                ce('div', {className: 'col-auto'},
-                                    ce("h5", null, "Round: " + this.state.round)
+            ce('div', {className: "row justify-content-md-center row-eq-height"},
+                ce('div', {className: "col-lg-6"},
+                    ce('div', {className: "card mb-3"},
+                        ce('div', {className: 'card-header'},
+                            ce('div', {className: 'card-title'},
+                                ce('div', {className: 'row align-middle justify-content-between'},
+                                    ce('div', {className: 'col-auto'},
+                                        ce("h5", null, "Round: " + this.state.round)
                                     )
                                 )
-                            ),
-                            ce('div', {className: 'card-body'},
-                                ce('div', {className: 'window'},
-                                ce('br'),
-                                ce('p', {className: "card-text my-3", id:"timer"}, "Time remaining: "),
-                                ce('h3',{id:"currQuestion"}, this.state.currQuestion),
-                                ce('div', {id:'playerdiv'}, "")
+                            )
+                        ),
+                        ce('div', {className: 'card-body'},
+                            ce('div', {className: 'window'},
+                                ce('h4',{id:"currQuestion", className: 'my-3'}, this.state.currQuestion),
+                                ce('div', {className: 'row justify-content-md-center'},
+                                    ce('div', {className: 'col-sm-8'},
+                                        ce('div', {className: 'row row-cols-3', id:'playerdiv'})
+                                    )
                                 )
-                            )       
+                            )
+                        )
+                    ),
+                    ce('div', {className: 'd-flex align-items-center my-3'},
+                        ce('div', {className: 'flex-shrink-0'},
+                            ce('img', {src: '/versionedAssets/images/clock.png'})
+                        ),
+                        ce('div', {className: 'flex-grow-1 ms-3'},
+                            ce('p', {className: 'lead', style: {marginBottom: 0}},
+                                ce('strong', {id: 'timer'}, "Seconds")
+                            )
                         )
                     )
                 )
             )
-        );
+        )
     }
 
     countdown() {
         if (currTime > 0 && !alreadyanswered) {
-            document.getElementById("timer").innerHTML = "Time remaining: " + currTime;
+            document.getElementById("timer").innerHTML = currTime + " Seconds";
+            if (currTime < 15) document.getElementById("timer").className = "lead text-danger";
             currTime -= 1;
         } else if (!alreadyanswered) {
-            document.getElementById("timer").innerHTML = "Time remaining: " + currTime;
+            document.getElementById("timer").innerHTML = currTime + " Seconds";
             socket.send("NOANSWER")
             alreadyanswered = true;
             clearInterval(timerid);
@@ -563,6 +576,7 @@ class DisplayGameComponent extends React.Component {
         let index = 1;
         for (const player of this.state.players) {
             let playerdiv = document.createElement("div");
+            playerdiv.className = "col";
             playerdiv.active = false;
             playerdiv.onclick = function() {
                 const allanswers = this.parentElement.children;
@@ -584,7 +598,8 @@ class DisplayGameComponent extends React.Component {
             playername.innerHTML = index + '. ' + player.split(",")[0]; 
             index++;
             let playerpic = document.createElement('img');
-            playerpic.src = "versionedAssets/images/" + player.split(",")[1] + ".png";    
+            playerpic.src = "versionedAssets/images/" + player.split(",")[1] + ".png";
+            playerpic.className = "img-fluid";
             playerdiv.appendChild(playerpic);
             playerdiv.appendChild(playername);
 
@@ -612,7 +627,6 @@ class RoundComponent extends React.Component { ////////////////////////////// RO
 
 
     render() {
-
         if (isHost) {
         return ce('div', {className: "container-sm mt-2 font-monospace"},
                 ce('div', {className: "row justify-content-md-center row-eq-height"},
@@ -626,21 +640,22 @@ class RoundComponent extends React.Component { ////////////////////////////// RO
                                         )
                                     )
                                 ),
-                                ce('div', {className: 'card-body'},
-                                    ce('div', {className: 'window'},
-                                        ce('p', {className: "card-text my-3"}, "Winner:"),
-                                        ce('img', {src:"versionedAssets/images/" + this.state.whowonpic + ".png"}),
-                                        ce('p', {className: "card-text my-3"}, this.state.whowon)
-                                ),
-                                ce('br'),
+                            ),
+                            ce('div', {className: 'card-body'},
+                                ce('div', {className: 'window text-center'},
+                                    ce('h4', {className: "card-text my-3"}, "Winner"),
+                                    ce('img', {src:"versionedAssets/images/" + this.state.whowonpic + ".png"}),
+                                    ce('p', {className: "card-text my-3 lead"}, this.state.whowon)
+                                )
+                            ),
+                            ce('div', {className: 'card-footer'},
                                 ce("button", {className: "btn btn-primary me-3", id:"NextButton", onClick: e => this.goToNextRound()}, "Next Round"),
                                 ce("button", {className: "btn btn-primary me-3", id:"HostNextButton", onClick: e => this.hostToNextRound()}, "Force Next Round")
-                                )
                             )
                         )
                     )
                 )
-            );
+            )
         } else {
             return ce('div', {className: "container-sm mt-2 font-monospace"},
             ce('div', {className: "row justify-content-md-center row-eq-height"},
@@ -651,23 +666,23 @@ class RoundComponent extends React.Component { ////////////////////////////// RO
                                 ce('div', {className: 'row align-middle justify-content-between'},
                                     ce('div', {className: 'col-auto'},
                                         ce("h5", {}, "ROUND OVER")
-                                        )
                                     )
-                                ),
-                                ce('div', {className: 'card-body'},
-                                    ce('div', {className: 'window'},
-                                        ce('p', {className: "card-text my-3"}, "Winner:"),
-                                        ce('img', {src:"versionedAssets/images/" + this.state.whowonpic + ".png"}),
-                                        ce('p', {className: "card-text my-3"}, this.state.whowon)
-                                    )
-                                ),
-                                ce('br'),
-                                ce("button", { className: "btn btn-primary me-3", id:"NextButton", onClick: e => this.goToNextRound()}, "Next Round")
+                                )
                             )
+                        ),
+                        ce('div', {className: 'card-body'},
+                            ce('div', {className: 'window text-center'},
+                                ce('h4', {className: "card-text my-3"}, "Winner"),
+                                ce('img', {src:"versionedAssets/images/" + this.state.whowonpic + ".png"}),
+                                ce('p', {className: "card-text my-3 lead"}, this.state.whowon)
+                            )
+                        ),
+                        ce('div', {className: 'card-footer'},
+                            ce("button", {className: "btn btn-primary me-3", id:"NextButton", onClick: e => this.goToNextRound()}, "Next Round"),
                         )
                     )
                 )
-            );
+            ))
         }
     }
 
@@ -703,49 +718,61 @@ class GameOverComponent extends React.Component { ///////////////////////////// 
     render() {
         if (isHost) {
             return ce('div', {className: "container-sm mt-2 font-monospace"},
-            ce('div', {className: "row justify-content-md-center row-eq-height"},
-                ce('div', {className: "col-lg-6"},
-                    ce('div', {className: "card mb-3"},
-                        ce('div', {className: 'card-header'},
-                            ce('div', {className: 'card-title'},
-                                ce('div', {className: 'row align-middle justify-content-between'},
-                                    ce('div', {className: 'col-auto'},
-                                        ce("h5", {}, "GAME OVER")
-                                        )
-                                    )
-                                ),
-                                ce('p', {className: "card-text my-3"}, "Most Popular Player: " + this.state.mostpopular),
-                                ce('p', {className: "card-text my-3"}, "Least Popular Player: " + this.state.leastpopular),
-                                ce('p', {className: "card-text my-3"}, "Quickest Player: " + this.state.fastest),
-                                ce('br'),
-                                ce('button', {className: "btn btn-primary me-3", onClick: e => this.resetGame()}, "Play Again"),
-                                ce('br')
+                ce('div', {className: "row justify-content-md-center"},
+                    ce('div', {className: "col-lg-8"},
+                        ce('div', {className: "row row-eq-height mt-3"},
+                            ce('div', {className: "col-sm text-center"},
+                                ce('h4', null, "Least Popular"),
+                                ce('p', null, "This player was chosen the least--looks like someone needs to get out there more..."),
+                                ce('p', {className: 'mt-3'}, ce('mark', null, this.state.leastpopular)),
+                                ce('img', {className: "img-fluid", src: "/versionedAssets/images/leastpopular.png"})
+                            ),
+                            ce('div', {className: "col-sm text-center"},
+                                ce('h4', null, "Most Popular"),
+                                ce('p', null, "This player was chosen the most--they must be pretty popular. Or just totally insane."),
+                                ce('p', {className: 'mt-3'}, ce('mark', null, this.state.mostpopular)),
+                                ce('img', {className: "img-fluid", src: "/versionedAssets/images/popular.png"})
+                            ),
+                            ce('div', {className: "col-sm text-center"},
+                                ce('h4', null, "Most Decisive"),
+                                ce('p', null, "This player made the fastest decisions out of the group. Someone knows what they want."),
+                                ce('p', {className: 'mt-3'}, ce('mark', null, this.state.fastest)),
+                                ce('img', {className: "img-fluid", src: "/versionedAssets/images/decisive.png"})
                             )
+                        ),
+                        ce('div', {className: 'text-center'},
+                            ce('button', {className: "btn btn-primary my-3", onClick: e => this.resetGame()}, "Play Again")
                         )
                     )
                 )
             )
         } else {
             return ce('div', {className: "container-sm mt-2 font-monospace"},
-            ce('div', {className: "row justify-content-md-center row-eq-height"},
-                ce('div', {className: "col-lg-6"},
-                    ce('div', {className: "card mb-3"},
-                        ce('div', {className: 'card-header'},
-                            ce('div', {className: 'card-title'},
-                                ce('div', {className: 'row align-middle justify-content-between'},
-                                    ce('div', {className: 'col-auto'},
-                                        ce("h5", {}, "GAME OVER")
-                                        )
-                                    )
-                                ),
-                                ce('p', {className: "card-text my-3"}, "Most Popular Player: " + this.state.mostpopular),
-                                ce('p', {className: "card-text my-3"}, "Least Popular Player: " + this.state.leastpopular),
-                                ce('p', {className: "card-text my-3"}, "Quickest Player: " + this.state.fastest)
+                ce('div', {className: "row justify-content-md-center"},
+                    ce('div', {className: "col-lg-8"},
+                        ce('div', {className: "row row-eq-height mt-3"},
+                            ce('div', {className: "col-sm text-center"},
+                                ce('h4', null, "Least Popular"),
+                                ce('p', null, "This player was chosen the least--looks like someone needs to get out there more..."),
+                                ce('p', {className: 'mt-3'}, ce('strong', null, this.state.leastpopular)),
+                                ce('img', {className: "img-fluid", src: "/versionedAssets/images/leastpopular.png"})
+                            ),
+                            ce('div', {className: "col-sm text-center"},
+                                ce('h4', null, "Most Popular"),
+                                ce('p', null, "This player was chosen the most--they must be pretty popular. Or just totally insane."),
+                                ce('p', {className: 'mt-3'}, ce('strong', null, this.state.mostpopular)),
+                                ce('img', {className: "img-fluid", src: "/versionedAssets/images/popular.png"})
+                            ),
+                            ce('div', {className: "col-sm text-center"},
+                                ce('h4', null, "Most Decisive"),
+                                ce('p', null, "This player made the fastest decisions out of the group. Someone knows what they want."),
+                                ce('p', {className: 'mt-3'}, ce('strong', null, this.state.fastest)),
+                                ce('img', {className: "img-fluid", src: "/versionedAssets/images/decisive.png"})
                             )
                         )
                     )
                 )
-            )    
+            )
         }
     }
 

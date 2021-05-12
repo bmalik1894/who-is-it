@@ -99,7 +99,13 @@ body {
     border-radius: 0;
     box-shadow: none;
 }
-
-.img-active {
-    border: 4px solid #D12D4B;
+#pic-div img {
+    cursor: pointer;
+    opacity: 0.6;
+}
+#pic-div img:hover {
+    opacity: 1.0;
+}
+#pic-div .active {
+    opacity: 1.0;
 }
